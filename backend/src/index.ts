@@ -27,12 +27,17 @@ const app = express();
 
 const rawJson = express.raw({ type: "application/json", limit: "1mb" });
 
+import { paystackWebhookHandler } from "./webhooks/paystack";
+
 // it's important that you don't parse the webhook event data, it should be in the raw format
 app.post("/webhooks/clerk", rawJson, (req, res) => {
   void clerkWebhookHandler(req, res);
 });
 app.post("/webhooks/polar", rawJson, (req, res) => {
   void polarWebhookHandler(req, res);
+});
+app.post("/webhooks/paystack", rawJson, (req, res) => {
+  void paystackWebhookHandler(req, res);
 });
 
 app.use(express.json());

@@ -15,18 +15,19 @@ const envSchema = z.object({
 
   POLAR_ACCESS_TOKEN: z.string().optional(),
   POLAR_WEBHOOK_SECRET: z.string().optional(),
-  POLAR_API_BASE: z.string().url().default("https://api.polar.sh"),
+  POLAR_API_BASE: z.string().url().optional(),
+  POLAR_CHECKOUT_PRODUCT_ID: z.string().uuid().optional(),
 
-  POLAR_CHECKOUT_PRODUCT_ID: z.string().uuid(),
+  PAYSTACK_SECRET_KEY: z.string().min(1).optional(),
 
-  STREAM_API_KEY: z.string().min(1),
-  STREAM_API_SECRET: z.string().min(1),
+  STREAM_API_KEY: z.string().min(1).optional(),
+  STREAM_API_SECRET: z.string().min(1).optional(),
 
   IMAGEKIT_PUBLIC_KEY: z.string().min(1),
   IMAGEKIT_PRIVATE_KEY: z.string().min(1),
   IMAGEKIT_URL_ENDPOINT: z.string().url(),
 
-  SENTRY_DSN: z.string().url().optional(),
+  SENTRY_DSN: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

@@ -36,9 +36,9 @@ export async function createCheckout(req: Request, res: Response, next: NextFunc
       return;
     }
 
-    // polar access token is required
-    if (!env.POLAR_ACCESS_TOKEN) {
-      res.status(503).json({ error: "Payments are not configured" });
+    // polar access token is required, but we are switching to paystack
+    if (!env.PAYSTACK_SECRET_KEY) {
+      res.status(503).json({ error: "Payments are not configured (Paystack secret key missing)" });
       return;
     }
 
@@ -77,7 +77,7 @@ export async function createCheckout(req: Request, res: Response, next: NextFunc
 
     if (totalCents < 10) {
       res.status(400).json({
-        error: "Total below Polar minimum (e.g. USD requires at least 10 cents)",
+        error: "Total below minimum",
       });
       return;
     }
@@ -93,32 +93,22 @@ export async function createCheckout(req: Request, res: Response, next: NextFunc
       .returning();
 
     const successUrl = `${env.FRONTEND_URL}/checkout/return?checkout_id={CHECKOUT_ID}`;
-    const returnUrl = `${env.FRONTEND_URL}/cart`;
 
-    const checkout = await polarCreateCheckout(env, {
-      products: [env.POLAR_CHECKOUT_PRODUCT_ID],
-      prices: {
-        [env.POLAR_CHECKOUT_PRODUCT_ID]: [
-          {
-            amount_type: "fixed",
-            price_currency: "usd",
-            price_amount: totalCents,
-          },
-        ],
-      },
+    const { paystackInitializeCheckout } = await import("../lib/paystack");
 
-      success_url: successUrl,
-      return_url: returnUrl,
-      external_customer_id: userId,
+    const checkout = await paystackInitializeCheckout(env, {
+      email: localUser.email || "customer@example.com",
+      amount: totalCents, // Paystack amounts are in kobo, cents are equivalent (1/100 of base currency)
       metadata: { checkout_session_id: session.id },
+      callback_url: successUrl.replace("{CHECKOUT_ID}", session.id),
     });
 
     await db
       .update(checkoutSessions)
-      .set({ polarCheckoutId: checkout.id })
+      .set({ paystackReference: checkout.reference })
       .where(eq(checkoutSessions.id, session.id));
 
-    res.json({ checkoutUrl: checkout.url });
+    res.json({ checkoutUrl: checkout.authorization_url });
   } catch (e) {
     next(e);
   }

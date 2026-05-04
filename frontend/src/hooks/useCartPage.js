@@ -38,22 +38,27 @@ export default function useCartPage() {
   async function checkout() {
     setCheckoutLoading(true);
 
-    const body = {
-      items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
-    };
+    try {
+      const body = {
+        items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
+      };
 
-    const res = await apiFetch("/api/checkout", {
-      getToken,
-      method: "POST",
-      body,
-    });
+      const res = await apiFetch("/api/checkout", {
+        getToken,
+        method: "POST",
+        body,
+      });
 
-    if (res?.checkoutUrl) {
-      window.location.href = res.checkoutUrl;
-      return;
+      if (res?.checkoutUrl) {
+        window.location.href = res.checkoutUrl;
+        return;
+      }
+    } catch (error) {
+      console.error("Checkout failed:", error);
+      alert("Checkout failed: " + (error.message || "Unknown error"));
+    } finally {
+      setCheckoutLoading(false);
     }
-
-    setCheckoutLoading(false);
   }
 
   return {

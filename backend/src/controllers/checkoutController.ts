@@ -7,6 +7,7 @@ import { db } from "../db";
 import { CheckoutSessionLine, checkoutSessions, products } from "../db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import { polarCreateCheckout } from "../lib/polar";
+import { paystackInitializeCheckout } from "../lib/paystack";
 
 const env = getEnv();
 
@@ -93,8 +94,6 @@ export async function createCheckout(req: Request, res: Response, next: NextFunc
       .returning();
 
     const successUrl = `${env.FRONTEND_URL}/checkout/return?checkout_id={CHECKOUT_ID}`;
-
-    const { paystackInitializeCheckout } = await import("../lib/paystack");
 
     const checkout = await paystackInitializeCheckout(env, {
       email: localUser.email || "customer@example.com",

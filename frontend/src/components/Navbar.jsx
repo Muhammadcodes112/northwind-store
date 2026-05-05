@@ -47,6 +47,38 @@ const Navbar = () => {
             <span className="hidden sm:inline">Shop</span>
           </Link>
 
+          <form 
+            className="relative" 
+            onSubmit={(e) => {
+              e.preventDefault();
+              const q = new FormData(e.target).get("q").trim();
+              if (q) window.location.href = `/?q=${encodeURIComponent(q)}#catalog`;
+              else window.location.href = `/#catalog`;
+            }}
+          >
+            <input
+              name="q"
+              type="text"
+              placeholder="Search..."
+              className="input input-sm input-bordered w-24 sm:w-32 lg:w-48 pl-8 focus:w-32 sm:focus:w-48 lg:focus:w-64 transition-all duration-300"
+              defaultValue={new URLSearchParams(window.location.search).get("q") || ""}
+            />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-base-content/50"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </form>
+
           <Show when={"signed-in"}>
             <Link to="/orders" className="btn btn-ghost gap-2 font-medium">
               <PackageIcon className="size-6 opacity-90" aria-hidden />

@@ -14,6 +14,8 @@ function HomePage() {
     loadingCategories,
     loadingList,
     setCategory,
+    searchQuery,
+    setSearchQuery,
   } = useHomeCatalog();
 
   return (
@@ -31,29 +33,31 @@ function HomePage() {
             </h2>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              className={`btn btn-sm ${!categoryFilter ? "btn-primary" : "btn-ghost border border-base-300"}`}
-              onClick={() => setCategory("")}
-            >
-              All
-            </button>
+          <div className="flex flex-col sm:items-end gap-3">
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                className={`btn btn-sm ${!categoryFilter ? "btn-primary" : "btn-ghost border border-base-300"}`}
+                onClick={() => setCategory("")}
+              >
+                All
+              </button>
 
-            {categoryChipsLoading
-              ? [1, 2, 3, 4].map((i) => (
-                  <div key={i} className="skeleton h-8 w-20 rounded-lg" aria-hidden />
-                ))
-              : categories.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    className={`btn btn-sm ${categoryFilter === c ? "btn-primary" : "btn-ghost border border-base-300"}`}
-                    onClick={() => setCategory(c)}
-                  >
-                    {c}
-                  </button>
-                ))}
+              {categoryChipsLoading
+                ? [1, 2, 3, 4].map((i) => (
+                    <div key={i} className="skeleton h-8 w-20 rounded-lg" aria-hidden />
+                  ))
+                : categories.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      className={`btn btn-sm ${categoryFilter === c ? "btn-primary" : "btn-ghost border border-base-300"}`}
+                      onClick={() => setCategory(c)}
+                    >
+                      {c}
+                    </button>
+                  ))}
+            </div>
           </div>
         </div>
 

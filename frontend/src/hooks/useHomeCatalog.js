@@ -35,12 +35,31 @@ export function useHomeCatalog() {
   });
 
   const categories = categoriesData?.categories ?? [];
-  const products = productsData?.products ?? [];
+  let products = productsData?.products ?? [];
   const categoryChipsLoading = loadingCategories && categories.length === 0;
+
+  const searchQuery = searchParams.get("q")?.trim() ?? "";
+
+  const setSearchQuery = (q) => {
+    const next = new URLSearchParams(searchParams);
+    if (!q) next.delete("q");
+    else next.set("q", q);
+    setSearchParams(next, { replace: true });
+  };
+
+  if (searchQuery) {
+    const lowerQ = searchQuery.toLowerCase();
+    products = products.filter((p) => 
+      p.name.toLowerCase().includes(lowerQ) || 
+      (p.description && p.description.toLowerCase().includes(lowerQ))
+    );
+  }
 
   return {
     categoryFilter,
     setCategory,
+    searchQuery,
+    setSearchQuery,
     categories,
     products,
     categoryChipsLoading,

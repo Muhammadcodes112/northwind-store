@@ -105,9 +105,9 @@ const Navbar = () => {
               </Link>
 
               {role === "admin" ? (
-                <Link to="/admin" className="btn btn-ghost gap-2 font-medium text-secondary hidden md:inline-flex">
-                  <SettingsIcon className="size-6" aria-hidden />
-                  <span>Admin</span>
+                <Link to="/admin" className="btn btn-ghost btn-circle md:btn-rectangle md:w-auto md:px-4 gap-2 font-medium text-secondary">
+                  <SettingsIcon className="size-5 md:size-6" aria-hidden />
+                  <span className="hidden md:inline">Admin</span>
                 </Link>
               ) : null}
             </Show>

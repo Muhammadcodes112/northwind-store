@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { Link } from "react-router";
 import { IK_PRESETS, imageKitOptimizedUrl } from "../lib/imagekitUrl";
 import { formatPrice } from "../utils/format";
@@ -7,18 +7,39 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 export function HomeHero({ products, loading }) {
   const scrollRef = useRef(null);
 
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, offsetWidth } = scrollRef.current;
+      const maxScroll = scrollWidth - offsetWidth;
+      
+      let nextScroll = scrollLeft + (direction === 'left' ? -offsetWidth : offsetWidth);
+      
+      // Loop back to start if reaching the end
+      if (direction === 'right' && scrollLeft >= maxScroll - 10) {
+        nextScroll = 0;
+      } else if (direction === 'left' && scrollLeft <= 10) {
+        nextScroll = maxScroll;
+      }
+
+      scrollRef.current.scrollTo({ left: nextScroll, behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    if (loading || !products || products.length === 0) return;
+    
+    const interval = setInterval(() => {
+      scroll('right');
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [loading, products]);
+
   if (loading) return <div className="skeleton h-64 w-full rounded-box" />;
   if (!products || products.length === 0) return null;
 
   // Use exactly 5 products
   const recentProducts = products.slice(0, 5);
-
-  const scroll = (direction) => {
-    if (scrollRef.current) {
-      const scrollAmount = scrollRef.current.offsetWidth;
-      scrollRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
-    }
-  };
 
   return (
     <section className="relative w-full max-w-7xl mx-auto overflow-hidden rounded-none md:rounded-xl shadow-sm bg-[#f2f4e6] group">

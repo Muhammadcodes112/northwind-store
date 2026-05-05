@@ -79,51 +79,13 @@ function OrderDetailPage() {
           </div>
         </div>
 
-        <div className="border-t border-base-300 bg-base-200/40 px-5 py-4 sm:px-8">
-          <p className="max-w-3xl text-sm leading-relaxed text-base-content/80">
-            Need help with shipping or returns? Open the{" "}
-            <strong className="text-base-content">Support chat</strong> tab after payment. Video
-            call links are shared in that thread; everyone joins with the same link.
-          </p>
-        </div>
-      </div>
-
       <div>
         <div className="flex items-center gap-2 border-b border-base-300 pb-3">
-          <HeadphonesIcon className="size-5 text-primary" aria-hidden />
+          <LayoutListIcon className="size-5 text-primary" aria-hidden />
           <h2 className="text-sm font-semibold uppercase tracking-wide text-base-content">
-            Customer support
+            Order Summary
           </h2>
         </div>
-
-        <div className="tabs tabs-boxed mt-3 w-fit flex-wrap bg-base-300/50 p-1">
-          <NavLink to={`/orders/${id}`} end className={tabClass}>
-            <LayoutListIcon className="size-4 shrink-0" aria-hidden />
-            Summary
-          </NavLink>
-
-          {paid ? (
-            <NavLink to={`/orders/${id}/chat`} className={tabClass}>
-              <MessageCircleIcon className="size-4 shrink-0" aria-hidden />
-              Support chat
-            </NavLink>
-          ) : (
-            <span className="tab tab-disabled gap-2 cursor-not-allowed opacity-50">
-              <LockIcon className="size-4 shrink-0" aria-hidden />
-              Support chat
-            </span>
-          )}
-        </div>
-
-        {!paid ? (
-          <div role="alert" className="alert alert-warning mt-4 text-sm">
-            <LockIcon className="size-4 shrink-0" aria-hidden />
-            <span>
-              Support unlocks when this order is marked{" "}
-              <strong className="text-base-content">paid</strong> (once payment is confirmed).
-            </span>
-          </div>
-        ) : null}
 
         <div className="mt-5">
           <Outlet context={{ order, items, paid }} />

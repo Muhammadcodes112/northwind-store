@@ -14,7 +14,6 @@ import keepAliveCron from "./lib/cron";
 
 import productRouter from "./routes/productRouter";
 import meRouter from "./routes/meRouter";
-import streamRouter from "./routes/streamRouter";
 import chekoutRouter from "./routes/chekoutRouter";
 import adminRouter from "./routes/adminRouter";
 import orderRouter from "./routes/orderRouter";
@@ -51,7 +50,6 @@ app.get("/health", (_req, res) => {
 
 app.use("/api/me", meRouter);
 app.use("/api/products", productRouter);
-app.use("/api/stream", streamRouter);
 app.use("/api/checkout", chekoutRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/orders", orderRouter);

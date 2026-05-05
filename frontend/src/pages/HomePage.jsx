@@ -29,7 +29,7 @@ function HomePage() {
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-2xl font-bold text-base-content md:text-2xl uppercase font-mono">
-              Catalog
+              All Categories
             </h2>
           </div>
 
@@ -40,7 +40,7 @@ function HomePage() {
                 className={`btn btn-sm ${!categoryFilter ? "btn-primary" : "btn-ghost border border-base-300"}`}
                 onClick={() => setCategory("")}
               >
-                All
+                All Categories
               </button>
 
               {categoryChipsLoading

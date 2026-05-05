@@ -10,8 +10,6 @@ import ProductDetailPage from "./pages/ProductDetailPage";
 import { SentryDemoPage } from "./pages/SentryDemoPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
 import OrderSummaryPage from "./pages/OrderSummaryPage";
-import OrderChatPage from "./pages/OrderChatPage";
-import OrderVideoPage from "./pages/OrderVideoPage";
 import AdminProductsPage from "./pages/AdminProductsPage";
 
 function App() {
@@ -34,11 +32,6 @@ function App() {
         <Route path="/demo-sentry" element={<SentryDemoPage />} />
 
         <Route
-          path="/orders/:id/call"
-          element={isSignedIn ? <OrderVideoPage /> : <Navigate to={"/"} replace />}
-        />
-
-        <Route
           path="/admin"
           element={isSignedIn ? <AdminProductsPage /> : <Navigate to="/" replace />}
         />
@@ -46,7 +39,6 @@ function App() {
         {/* NESTED ROUTES */}
         <Route path="/orders/:id" element={<OrderDetailPage />}>
           <Route index element={<OrderSummaryPage />} />
-          <Route path="chat" element={<OrderChatPage />} />
         </Route>
       </Routes>
     </Layout>

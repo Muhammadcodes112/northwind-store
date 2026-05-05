@@ -6,6 +6,7 @@ import { IK_PRESETS, imageKitOptimizedUrl, imageKitWatermarkedUrl } from "../lib
 import { useCart } from "../store/cart";
 import { ArrowLeftIcon, CheckIcon, ExternalLinkIcon, ShoppingCartIcon } from "lucide-react";
 import { formatPrice } from "../utils/format";
+import { ProductReviews } from "../components/ProductReviews";
 
 import toast from "react-hot-toast";
 
@@ -129,6 +130,8 @@ function ProductDetailPage() {
           </div>
         </div>
       </div>
+
+      <ProductReviews productSlug={p.slug} />
     </div>
   );
 }

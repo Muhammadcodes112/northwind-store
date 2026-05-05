@@ -25,7 +25,7 @@ function OrderDetailPage() {
       <PageError message="Order not found." action={{ to: "/orders", label: "Back to orders" }} />
     );
   }
-
+}
   return (
     <div className="space-y-8 text-left">
       <Link

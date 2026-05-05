@@ -4,8 +4,21 @@ import { formatPrice } from "../utils/format.js";
 import { IK_PRESETS, imageKitOptimizedUrl } from "../lib/imagekitUrl.js";
 import { useCart } from "../store/cart.js";
 
+import toast from "react-hot-toast";
+
 export function CatalogProductCard({ product }) {
   const addItem = useCart((s) => s.addItem);
+
+  const handleAdd = () => {
+    addItem(product.id);
+    toast.success(`Added ${product.name} to cart!`, {
+      style: {
+        borderRadius: '10px',
+        background: '#333',
+        color: '#fff',
+      },
+    });
+  };
 
   return (
     <article className="card group h-full overflow-hidden border border-base-300 bg-base-100 shadow-md transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-xl">
@@ -41,7 +54,7 @@ export function CatalogProductCard({ product }) {
           </span>
           <button
             type="button"
-            onClick={() => addItem(product.id)}
+            onClick={handleAdd}
             className="btn btn-primary btn-sm gap-1 shadow"
           >
             <PlusIcon className="size-4" aria-hidden />

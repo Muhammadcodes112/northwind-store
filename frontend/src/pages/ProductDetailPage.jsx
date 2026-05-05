@@ -7,6 +7,8 @@ import { useCart } from "../store/cart";
 import { ArrowLeftIcon, CheckIcon, ExternalLinkIcon, ShoppingCartIcon } from "lucide-react";
 import { formatPrice } from "../utils/format";
 
+import toast from "react-hot-toast";
+
 const HIGHLIGHTS = [
   "Secure checkout",
   "Support from your order after payment",
@@ -16,6 +18,17 @@ const HIGHLIGHTS = [
 function ProductDetailPage() {
   const addItem = useCart((s) => s.addItem);
   const { product, isLoading, error } = useProductPage();
+
+  const handleAdd = (product) => {
+    addItem(product.id);
+    toast.success(`Added ${product.name} to cart!`, {
+      style: {
+        borderRadius: '10px',
+        background: '#333',
+        color: '#fff',
+      },
+    });
+  };
 
   if (isLoading) return <ProductPageSkeleton />;
 
@@ -102,7 +115,7 @@ function ProductDetailPage() {
           <div className="mt-8 flex flex-wrap gap-3">
             <button
               type="button"
-              onClick={() => addItem(p.id)}
+              onClick={() => handleAdd(p)}
               className="btn btn-primary btn-lg gap-2 shadow-lg"
             >
               <ShoppingCartIcon className="size-5" aria-hidden />

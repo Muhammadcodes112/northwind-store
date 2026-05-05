@@ -37,6 +37,8 @@ Sentry.init({
   enableLogs: true,
 });
 
+import { Toaster } from "react-hot-toast";
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ClerkProvider>
@@ -44,6 +46,7 @@ createRoot(document.getElementById("root")).render(
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <Sentry.ErrorBoundary fallback={<SentryErrorFallback />}>
+            <Toaster position="bottom-right" />
             <App />
           </Sentry.ErrorBoundary>
         </BrowserRouter>

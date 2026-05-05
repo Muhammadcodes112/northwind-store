@@ -47,7 +47,7 @@ function HomePage() {
                 ? [1, 2, 3, 4].map((i) => (
                     <div key={i} className="skeleton h-8 w-20 rounded-lg" aria-hidden />
                   ))
-                : categories.map((c) => (
+                : ["Pharmaceutical Drugs", "cosmetics", "Boutiques", "accessories"].map((c) => (
                     <button
                       key={c}
                       type="button"

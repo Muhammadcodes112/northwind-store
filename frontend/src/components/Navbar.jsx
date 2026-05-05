@@ -2,6 +2,7 @@ import { Show, SignInButton, useAuth, UserButton } from "@clerk/react";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "../lib/api";
 import { Link } from "react-router";
+import { useEffect, useState } from "react";
 
 import {
   LogInIcon,
@@ -10,6 +11,8 @@ import {
   ShoppingBagIcon,
   ShoppingCartIcon,
   StoreIcon,
+  MoonIcon,
+  SunIcon,
 } from "lucide-react";
 import { useCart } from "../store/cart";
 
@@ -45,6 +48,19 @@ const SearchForm = ({ className }) => (
 const Navbar = () => {
   const { getToken, isSignedIn } = useAuth();
 
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "light";
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "forest" : "light"));
+  };
+
   const { data: meData } = useQuery({
     queryKey: ["me"],
     queryFn: () => apiFetch("/api/me", { getToken }),
@@ -67,7 +83,7 @@ const Navbar = () => {
               <span className="flex size-10 items-center justify-center rounded-lg bg-primary/15 p-1 text-primary">
                 <StoreIcon className="size-8" aria-hidden />
               </span>
-              <span className="leading-none">Northwind</span>
+              <span className="leading-none">Emporium Corner</span>
             </Link>
           </div>
 
@@ -108,7 +124,11 @@ const Navbar = () => {
               <span className="hidden sm:inline">Cart</span>
             </Link>
 
+            {/* Theme Toggle for signed-out users */}
             <Show when={"signed-out"}>
+              <button onClick={toggleTheme} className="btn btn-ghost btn-circle">
+                {theme === "light" ? <MoonIcon className="size-5" /> : <SunIcon className="size-5" />}
+              </button>
               <SignInButton mode="modal">
                 <button type="button" className="btn btn-primary btn-sm gap-1.5 px-3 shadow-md">
                   <LogInIcon className="size-4 drop-shadow-sm" aria-hidden />
@@ -119,9 +139,15 @@ const Navbar = () => {
 
             <Show when={"signed-in"}>
               <div className="flex items-center gap-2 border-l border-base-300 pl-3">
-                <UserButton
-                  appearance={{ elements: { avatarBox: "h-10 w-10 ring-2 ring-base-300" } }}
-                />
+                <UserButton appearance={{ elements: { avatarBox: "h-10 w-10 ring-2 ring-base-300" } }}>
+                  <UserButton.MenuItems>
+                    <UserButton.Action 
+                      label={theme === "light" ? "Dark Mode" : "Light Mode"} 
+                      labelIcon={theme === "light" ? <MoonIcon className="size-4" /> : <SunIcon className="size-4" />} 
+                      onClick={toggleTheme} 
+                    />
+                  </UserButton.MenuItems>
+                </UserButton>
                 {role === "support" || role === "admin" ? (
                   <span className="badge badge-primary badge-sm hidden capitalize md:inline-flex">
                     {role}

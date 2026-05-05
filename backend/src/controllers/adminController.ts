@@ -54,7 +54,7 @@ export async function requireAdmin(req: Request, res: Response, next: NextFuncti
     }
     const user = await getLocalUser(userId);
 
-    if (!isAdmin(user.role)) {
+    if (!user || !isAdmin(user.role)) {
       res.status(403).json({ error: "Admin only" });
       return;
     }

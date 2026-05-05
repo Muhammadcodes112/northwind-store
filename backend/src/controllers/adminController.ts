@@ -8,9 +8,9 @@ import { db } from "../db";
 import { orderItems, products } from "../db/schema";
 import { count, desc, eq } from "drizzle-orm";
 import { z } from "zod";
+import { clerkClient } from "@clerk/express";
 import { deleteImageKitAsset } from "../lib/imagekit";
-
-const env = getEnv();
+import { users } from "../db/schema";
 
 const productCreate = z.object({
   slug: z.string().min(1),
@@ -170,6 +170,87 @@ export async function deleteAdminProduct(req: Request, res: Response, next: Next
     await db.delete(products).where(eq(products.id, id));
 
     res.json({ ok: true });
+  } catch (e) {
+    next(e);
+  }
+}
+
+export async function getAdminStats(_req: Request, res: Response, next: NextFunction) {
+  try {
+    const [countRow] = await db.select({ c: count() }).from(users);
+    res.json({ userCount: Number(countRow?.c ?? 0) });
+  } catch (e) {
+    next(e);
+  }
+}
+
+export async function listAdmins(_req: Request, res: Response, next: NextFunction) {
+  try {
+    const rows = await db.select().from(users).where(eq(users.role, "admin")).orderBy(desc(users.createdAt));
+    res.json({ admins: rows });
+  } catch (e) {
+    next(e);
+  }
+}
+
+export async function addAdmin(req: Request, res: Response, next: NextFunction) {
+  try {
+    const email = req.body.email;
+    if (!email || typeof email !== "string") {
+      res.status(400).json({ error: "Valid email is required" });
+      return;
+    }
+
+    // Since Clerk provides emails as the primary identifier sometimes, we search by email
+    const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+
+    if (!user) {
+      res.status(404).json({ error: "User with this email not found" });
+      return;
+    }
+
+    if (user.role === "admin") {
+      res.status(400).json({ error: "User is already an admin" });
+      return;
+    }
+
+    const [updated] = await db
+      .update(users)
+      .set({ role: "admin", updatedAt: new Date() })
+      .where(eq(users.id, user.id))
+      .returning();
+
+    await clerkClient.users.updateUserMetadata(user.clerkUserId, {
+      publicMetadata: { role: "admin" },
+    });
+
+    res.json({ admin: updated });
+  } catch (e) {
+    next(e);
+  }
+}
+
+export async function removeAdmin(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = req.params.id as string;
+    const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    const [updated] = await db
+      .update(users)
+      .set({ role: "customer", updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+
+    await clerkClient.users.updateUserMetadata(user.clerkUserId, {
+      publicMetadata: { role: "customer" },
+    });
+
+    res.json({ admin: updated });
   } catch (e) {
     next(e);
   }

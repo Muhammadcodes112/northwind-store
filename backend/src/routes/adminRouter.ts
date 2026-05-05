@@ -8,6 +8,7 @@ import {
   updateAdminProduct,
   getAdminStats,
   listAdmins,
+  listUsers,
   addAdmin,
   removeAdmin,
   listAdminOrders,
@@ -25,6 +26,7 @@ router.patch("/products/:id", updateAdminProduct);
 router.delete("/products/:id", deleteAdminProduct);
 
 router.get("/stats", getAdminStats);
+router.get("/users", listUsers);
 router.get("/admins", listAdmins);
 router.post("/admins", addAdmin);
 router.delete("/admins/:id", removeAdmin);

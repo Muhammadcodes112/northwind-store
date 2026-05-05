@@ -13,7 +13,7 @@ const createReviewSchema = z.object({
 
 export async function listProductReviews(req: Request, res: Response, next: NextFunction) {
   try {
-    const { slug } = req.params;
+    const slug = req.params.slug as string;
 
     const [product] = await db.select().from(products).where(eq(products.slug, slug)).limit(1);
     if (!product) {
@@ -49,7 +49,7 @@ export async function createProductReview(req: Request, res: Response, next: Nex
       return;
     }
 
-    const { slug } = req.params;
+    const slug = req.params.slug as string;
     const [product] = await db.select().from(products).where(eq(products.slug, slug)).limit(1);
     if (!product) {
       res.status(404).json({ error: "Product not found" });

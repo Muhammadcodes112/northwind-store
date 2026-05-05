@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../../lib/api";
-import { Trash2Icon, UserPlusIcon, UsersIcon } from "lucide-react";
+import { Trash2Icon, UserPlusIcon, UsersIcon, ShieldAlertIcon } from "lucide-react";
 import toast from "react-hot-toast";
 
 export function AdminUsersTab({ getToken }) {
@@ -14,22 +14,23 @@ export function AdminUsersTab({ getToken }) {
     refetchInterval: 5000,
   });
 
-  const { data: adminsData, isLoading } = useQuery({
-    queryKey: ["admin", "admins"],
-    queryFn: () => apiFetch("/api/admin/admins", { getToken }),
+  const { data: usersData, isLoading } = useQuery({
+    queryKey: ["admin", "users"],
+    queryFn: () => apiFetch("/api/admin/users", { getToken }),
   });
 
   const addAdminMutation = useMutation({
-    mutationFn: (email) =>
+    mutationFn: (emailArg) =>
       apiFetch("/api/admin/admins", {
         method: "POST",
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: emailArg }),
         getToken,
       }),
     onSuccess: () => {
-      toast.success("Admin added successfully");
+      toast.success("Admin role granted successfully");
       setEmail("");
-      queryClient.invalidateQueries(["admin", "admins"]);
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "stats"] });
     },
     onError: (err) => {
       toast.error(err.message || "Failed to add admin");
@@ -43,8 +44,8 @@ export function AdminUsersTab({ getToken }) {
         getToken,
       }),
     onSuccess: () => {
-      toast.success("Admin removed successfully");
-      queryClient.invalidateQueries(["admin", "admins"]);
+      toast.success("Admin role removed successfully");
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
     },
     onError: (err) => {
       toast.error(err.message || "Failed to remove admin");
@@ -57,7 +58,7 @@ export function AdminUsersTab({ getToken }) {
     addAdminMutation.mutate(email);
   };
 
-  const admins = adminsData?.admins || [];
+  const allUsers = usersData?.users || [];
 
   return (
     <div className="space-y-8">
@@ -75,7 +76,7 @@ export function AdminUsersTab({ getToken }) {
 
       <div className="card border border-base-300 bg-base-100 shadow-sm">
         <div className="card-body">
-          <h2 className="card-title text-xl mb-4">Manage Admins</h2>
+          <h2 className="card-title text-xl mb-4">Manage Users & Roles</h2>
           
           <form onSubmit={handleAdd} className="flex flex-col sm:flex-row gap-3 mb-6">
             <input
@@ -84,19 +85,18 @@ export function AdminUsersTab({ getToken }) {
               className="input input-bordered w-full sm:max-w-xs"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
             <button
               type="submit"
               className="btn btn-primary gap-2"
-              disabled={addAdminMutation.isPending}
+              disabled={addAdminMutation.isPending || !email}
             >
               {addAdminMutation.isPending ? (
                 <span className="loading loading-spinner loading-sm" />
               ) : (
-                <UserPlusIcon className="size-4" />
+                <ShieldAlertIcon className="size-4" />
               )}
-              Add Admin
+              Make Admin
             </button>
           </form>
 
@@ -104,7 +104,6 @@ export function AdminUsersTab({ getToken }) {
             <table className="table table-zebra w-full">
               <thead>
                 <tr>
-                  <th>Name</th>
                   <th>Email</th>
                   <th>Role</th>
                   <th className="text-right">Actions</th>
@@ -113,38 +112,59 @@ export function AdminUsersTab({ getToken }) {
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan="4" className="text-center py-4">Loading...</td>
+                    <td colSpan="3" className="text-center py-4">Loading...</td>
                   </tr>
-                ) : admins.length === 0 ? (
+                ) : allUsers.length === 0 ? (
                   <tr>
-                    <td colSpan="4" className="text-center py-4 text-base-content/50">No admins found</td>
+                    <td colSpan="3" className="text-center py-4 text-base-content/50">No users found</td>
                   </tr>
                 ) : (
-                  admins.map((admin) => (
-                    <tr key={admin.id}>
-                      <td className="font-medium">{admin.displayName || "-"}</td>
-                      <td>{admin.email}</td>
+                  allUsers.map((user) => (
+                    <tr key={user.id}>
+                      <td>{user.email}</td>
                       <td>
-                        <span className="badge badge-primary badge-sm capitalize">{admin.role}</span>
+                        <span className={`badge badge-sm capitalize ${user.role === 'admin' ? 'badge-primary' : 'badge-neutral'}`}>
+                          {user.role}
+                        </span>
                       </td>
                       <td className="text-right">
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-xs text-error hover:bg-error/10 gap-1"
-                          onClick={() => {
-                            if (window.confirm(`Remove admin rights from ${admin.email}?`)) {
-                              removeAdminMutation.mutate(admin.id);
-                            }
-                          }}
-                          disabled={removeAdminMutation.isPending && removeAdminMutation.variables === admin.id}
-                        >
-                          {removeAdminMutation.isPending && removeAdminMutation.variables === admin.id ? (
-                            <span className="loading loading-spinner loading-xs" />
-                          ) : (
-                            <Trash2Icon className="size-3" />
-                          )}
-                          Remove
-                        </button>
+                        {user.role === "admin" ? (
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-xs text-error hover:bg-error/10 gap-1"
+                            onClick={() => {
+                              if (window.confirm(`Remove admin rights from ${user.email}?`)) {
+                                removeAdminMutation.mutate(user.id);
+                              }
+                            }}
+                            disabled={removeAdminMutation.isPending && removeAdminMutation.variables === user.id}
+                          >
+                            {removeAdminMutation.isPending && removeAdminMutation.variables === user.id ? (
+                              <span className="loading loading-spinner loading-xs" />
+                            ) : (
+                              <Trash2Icon className="size-3" />
+                            )}
+                            Remove Admin
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-xs text-primary hover:bg-primary/10 gap-1"
+                            onClick={() => {
+                              if (window.confirm(`Grant admin rights to ${user.email}?`)) {
+                                addAdminMutation.mutate(user.email);
+                              }
+                            }}
+                            disabled={addAdminMutation.isPending && addAdminMutation.variables === user.email}
+                          >
+                            {addAdminMutation.isPending && addAdminMutation.variables === user.email ? (
+                              <span className="loading loading-spinner loading-xs" />
+                            ) : (
+                              <UserPlusIcon className="size-3" />
+                            )}
+                            Make Admin
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))

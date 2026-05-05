@@ -88,13 +88,14 @@ export async function paystackWebhookHandler(req: Request, res: Response) {
 
       // Email Admins
       try {
-        const { users } = await import("../db/schema");
+        const { users } = await import("../db/schema.js");
         const adminUsers = await db.select().from(users).where(eq(users.role, "admin"));
         const adminEmails = adminUsers.map((u) => u.email).filter(Boolean);
 
         if (adminEmails.length > 0) {
           const resendKey = process.env.RESEND_API_KEY;
           if (resendKey) {
+            // @ts-ignore
             const { Resend } = await import("resend");
             const resend = new Resend(resendKey);
             await resend.emails.send({

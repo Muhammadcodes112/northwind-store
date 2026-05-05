@@ -12,6 +12,8 @@ import { clerkClient } from "@clerk/express";
 import { deleteImageKitAsset } from "../lib/imagekit";
 import { users } from "../db/schema";
 
+const env = getEnv();
+
 const productCreate = z.object({
   slug: z.string().min(1),
   name: z.string().min(1),
@@ -188,6 +190,15 @@ export async function listAdmins(_req: Request, res: Response, next: NextFunctio
   try {
     const rows = await db.select().from(users).where(eq(users.role, "admin")).orderBy(desc(users.createdAt));
     res.json({ admins: rows });
+  } catch (e) {
+    next(e);
+  }
+}
+
+export async function listUsers(_req: Request, res: Response, next: NextFunction) {
+  try {
+    const rows = await db.select().from(users).orderBy(desc(users.createdAt));
+    res.json({ users: rows });
   } catch (e) {
     next(e);
   }

@@ -64,9 +64,9 @@ function CartPage() {
                 </figure>
                 <div className="card-body min-w-0 flex-row flex-wrap items-center justify-between gap-4">
                   <div className="min-w-0 flex-1">
-                    <div className="card-title text-base">
+                    <div className="card-title text-xs sm:text-sm leading-tight">
                       {p ? (
-                        <Link to={`/product/${p.slug}`} className="link-hover link-primary">
+                        <Link to={`/product/${p.slug}`} className="link-hover link-primary line-clamp-2">
                           {p.name}
                         </Link>
                       ) : (
@@ -74,12 +74,12 @@ function CartPage() {
                       )}
                     </div>
                     {p ? (
-                      <p className="text-sm text-base-content/60">
+                      <p className="text-xs sm:text-sm text-base-content/60">
                         {formatPrice(p.priceCents, p.currency)} each
                       </p>
                     ) : null}
                     <div className="mt-2 flex flex-wrap items-center gap-3">
-                      <span className="text-sm text-base-content/70">Qty</span>
+                      <span className="text-xs sm:text-sm text-base-content/70">Qty</span>
                       <div className="join border border-base-300">
                         <button
                           type="button"
@@ -90,7 +90,7 @@ function CartPage() {
                           <MinusIcon className="size-4" aria-hidden />
                         </button>
                         <span
-                          className="join-item flex min-w-10 items-center justify-center bg-base-200 px-3 text-sm font-medium tabular-nums text-base-content"
+                          className="join-item flex min-w-8 sm:min-w-10 items-center justify-center bg-base-200 px-2 sm:px-3 text-xs sm:text-sm font-medium tabular-nums text-base-content"
                           aria-live="polite"
                         >
                           {line.quantity}
@@ -116,7 +116,7 @@ function CartPage() {
                       </button>
                     </div>
                   </div>
-                  <div className="text-right font-semibold text-base-content">
+                  <div className="text-right text-sm sm:text-base font-semibold text-base-content">
                     {p ? formatPrice(p.priceCents * line.quantity, p.currency) : "-"}
                   </div>
                 </div>
@@ -125,7 +125,7 @@ function CartPage() {
           </ul>
 
           <aside className="card border border-base-300 bg-base-100 p-6 shadow-md">
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-xs sm:text-sm">
               <span className="text-base-content/70">Subtotal</span>
               <span className="font-semibold text-base-content">
                 {formatPrice(subtotal, lines[0]?.product?.currency ?? "usd")}
@@ -158,7 +158,7 @@ function CartPage() {
               </SignInButton>
             </Show>
 
-            <p className="mt-4 flex items-start gap-2 text-xs text-base-content/60">
+            <p className="mt-4 flex items-start gap-2 text-[10px] sm:text-xs text-base-content/60">
               <HeadphonesIcon className="mt-0.5 size-3.5 shrink-0 text-primary" aria-hidden />
               <span>
                 After payment, open your order for{" "}

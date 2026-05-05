@@ -75,7 +75,7 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 border-b border-base-300 bg-base-100/95 shadow-sm backdrop-blur-md">
       <div className="mx-auto flex flex-col gap-2 max-w-7xl px-4 py-2.5 md:px-6 md:py-3">
         <div className="navbar p-0 min-h-0 flex-1 flex items-center justify-between">
-          <div className="flex-1">
+          <div className="flex-1 flex items-center gap-2">
             <Link
               to="/"
               className="btn btn-ghost gap-2 px-2 font-mono text-lg font-semibold uppercase tracking-wide md:text-xl"
@@ -83,36 +83,38 @@ const Navbar = () => {
               <span className="flex size-10 items-center justify-center rounded-lg bg-primary/15 p-1 text-primary">
                 <StoreIcon className="size-8" aria-hidden />
               </span>
-              <span className="leading-none">Emporium Corner</span>
+              <span className="leading-none hidden sm:inline">Emporium Corner</span>
             </Link>
+            {/* Mobile Search Bar inline */}
+            <SearchForm className="md:hidden w-36 sm:w-48" />
           </div>
 
           <nav className="flex items-center gap-1 md:gap-1.5">
-            <Link to="/" className="btn btn-ghost gap-2 font-medium">
+            <Link to="/" className="btn btn-ghost gap-2 font-medium hidden md:inline-flex">
               <ShoppingBagIcon className="size-6 opacity-90" aria-hidden />
-              <span className="hidden sm:inline">Shop</span>
+              <span>Shop</span>
             </Link>
 
             {/* Desktop Search Bar */}
             <SearchForm className="hidden md:block w-48 focus-within:w-64" />
 
             <Show when={"signed-in"}>
-              <Link to="/orders" className="btn btn-ghost gap-2 font-medium">
+              <Link to="/orders" className="btn btn-ghost gap-2 font-medium hidden md:inline-flex">
                 <PackageIcon className="size-6 opacity-90" aria-hidden />
-                <span className="hidden sm:inline">Orders</span>
+                <span>Orders</span>
               </Link>
 
               {role === "admin" ? (
-                <Link to="/admin" className="btn btn-ghost gap-2 font-medium text-secondary">
+                <Link to="/admin" className="btn btn-ghost gap-2 font-medium text-secondary hidden md:inline-flex">
                   <SettingsIcon className="size-6" aria-hidden />
-                  <span className="hidden sm:inline">Admin</span>
+                  <span>Admin</span>
                 </Link>
               ) : null}
             </Show>
 
             <Link
               to="/cart"
-              className="btn btn-ghost gap-2 font-medium indicator"
+              className="btn btn-ghost gap-2 font-medium indicator hidden md:inline-flex"
               aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : "Cart"}
             >
               {cartCount > 0 ? (
@@ -121,7 +123,7 @@ const Navbar = () => {
                 </span>
               ) : null}
               <ShoppingCartIcon className="size-6 opacity-90" aria-hidden />
-              <span className="hidden sm:inline">Cart</span>
+              <span>Cart</span>
             </Link>
 
             {/* Theme Toggle for signed-out users */}
@@ -156,11 +158,6 @@ const Navbar = () => {
               </div>
             </Show>
           </nav>
-        </div>
-        
-        {/* Mobile Search Bar */}
-        <div className="md:hidden pb-1 w-full">
-          <SearchForm className="w-full" />
         </div>
       </div>
     </header>

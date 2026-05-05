@@ -11,7 +11,7 @@ export function CatalogProductCard({ product }) {
 
   const handleAdd = () => {
     addItem(product.id);
-    toast.success(`Added ${product.name} to cart!`, {
+    toast.success(`item have been added to cart`, {
       style: {
         borderRadius: '10px',
         background: '#333',
@@ -38,27 +38,27 @@ export function CatalogProductCard({ product }) {
           {product.category ?? "General"}
         </span>
       </Link>
-      <div className="card-body grow gap-3 p-5 text-left">
+      <div className="card-body grow gap-2 p-3 sm:gap-3 sm:p-5 text-left">
         <Link
           to={`/product/${product.slug}`}
-          className="card-title line-clamp-2 text-lg transition group-hover:text-primary"
+          className="card-title line-clamp-2 text-sm sm:text-lg transition group-hover:text-primary"
         >
           {product.name}
         </Link>
-        <p className="line-clamp-3 text-sm leading-relaxed text-base-content/70">
+        <p className="line-clamp-2 sm:line-clamp-3 text-[10px] sm:text-xs leading-relaxed text-base-content/70">
           {product.description}
         </p>
-        <div className="card-actions mt-auto items-center justify-between border-t border-base-200 pt-4">
-          <span className="text-lg font-bold tabular-nums text-base-content">
+        <div className="card-actions mt-auto items-center justify-between border-t border-base-200 pt-2 sm:pt-4">
+          <span className="text-sm sm:text-lg font-bold tabular-nums text-base-content">
             {formatPrice(product.priceCents, product.currency)}
           </span>
           <button
             type="button"
             onClick={handleAdd}
-            className="btn btn-primary btn-sm gap-1 shadow"
+            className="btn btn-primary btn-xs sm:btn-sm gap-1 shadow"
           >
-            <PlusIcon className="size-4" aria-hidden />
-            Add
+            <PlusIcon className="size-3 sm:size-4" aria-hidden />
+            <span className="hidden sm:inline">Add</span>
           </button>
         </div>
       </div>

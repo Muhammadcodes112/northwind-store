@@ -2,5 +2,9 @@
 /* @plugin "daisyui"; */
 
 @plugin "daisyui" {
-  themes: forest --default;
+  themes: light --default, forest;
+}
+
+:root, [data-theme="light"] {
+  --color-primary: #1eb854;
 }

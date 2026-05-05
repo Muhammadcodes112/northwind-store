@@ -25,7 +25,7 @@ function OrderDetailPage() {
       <PageError message="Order not found." action={{ to: "/orders", label: "Back to orders" }} />
     );
   }
-}
+
   return (
     <div className="space-y-8 text-left">
       <Link
@@ -79,19 +79,21 @@ function OrderDetailPage() {
           </div>
         </div>
 
-      <div>
-        <div className="flex items-center gap-2 border-b border-base-300 pb-3">
-          <LayoutListIcon className="size-5 text-primary" aria-hidden />
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-base-content">
-            Order Summary
-          </h2>
-        </div>
+        <div>
+          <div className="flex items-center gap-2 border-b border-base-300 pb-3">
+            <LayoutListIcon className="size-5 text-primary" aria-hidden />
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-base-content">
+              Order Summary
+            </h2>
+          </div>
 
-        <div className="mt-5">
-          <Outlet context={{ order, items, paid }} />
+          <div className="mt-5">
+            <Outlet context={{ order, items, paid }} />
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
 export default OrderDetailPage;

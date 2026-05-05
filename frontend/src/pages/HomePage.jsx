@@ -20,9 +20,7 @@ function HomePage() {
 
   return (
     <div className="space-y-12">
-      <HomeHero categories={categories} loadingCategories={loadingCategories} />
-
-      <TrustStrip />
+      <HomeHero products={products} loading={loadingList} />
 
       {/* CATELOG */}
       <section id="catolag" className="scroll-mt-24">
@@ -62,10 +60,10 @@ function HomePage() {
         </div>
 
         {loadingList ? (
-          <ul className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            {[1, 2, 3, 4, 5].map((i) => (
               <li key={i}>
-                <div className="skeleton h-96 w-full rounded-box" />
+                <div className="skeleton h-64 sm:h-96 w-full rounded-box" />
               </li>
             ))}
           </ul>
@@ -76,7 +74,7 @@ function HomePage() {
             No products in this category yet.
           </div>
         ) : (
-          <ul className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             {products.map((p) => (
               <li key={p.id}>
                 <CatalogProductCard product={p} />
@@ -85,6 +83,8 @@ function HomePage() {
           </ul>
         )}
       </section>
+
+      <TrustStrip />
     </div>
   );
 }

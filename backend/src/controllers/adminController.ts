@@ -5,7 +5,7 @@ import { isAdmin } from "../lib/roles";
 import ImageKit from "@imagekit/nodejs";
 import { getEnv } from "../lib/env";
 import { db } from "../db";
-import { orderItems, products } from "../db/schema";
+import { orderItems, products, orders } from "../db/schema";
 import { count, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { clerkClient } from "@clerk/express";
@@ -251,6 +251,47 @@ export async function removeAdmin(req: Request, res: Response, next: NextFunctio
     });
 
     res.json({ admin: updated });
+  } catch (e) {
+    next(e);
+  }
+}
+
+export async function listAdminOrders(_req: Request, res: Response, next: NextFunction) {
+  try {
+    const rows = await db.query.orders.findMany({
+      orderBy: [desc(orders.createdAt)],
+      with: {
+        user: true,
+      },
+    });
+    res.json({ orders: rows });
+  } catch (e) {
+    next(e);
+  }
+}
+
+export async function updateAdminOrderStatus(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = req.params.id as string;
+    const { status } = req.body;
+
+    if (!["pending", "paid", "failed", "completed"].includes(status)) {
+      res.status(400).json({ error: "Invalid status" });
+      return;
+    }
+
+    const [updated] = await db
+      .update(orders)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(orders.id, id))
+      .returning();
+
+    if (!updated) {
+      res.status(404).json({ error: "Order not found" });
+      return;
+    }
+
+    res.json({ order: updated });
   } catch (e) {
     next(e);
   }

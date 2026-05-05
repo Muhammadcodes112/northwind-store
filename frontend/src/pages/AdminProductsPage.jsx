@@ -6,7 +6,7 @@ import { Navigate } from "react-router";
 import { LayoutDashboardIcon, PackageIcon, ShoppingCartIcon, UsersIcon } from "lucide-react";
 import { AdminProductsTab } from "../components/admin/AdminProductsTab.jsx";
 import { AdminUsersTab } from "../components/admin/AdminUsersTab.jsx";
-// import { AdminOrdersTab } from "../components/admin/AdminOrdersTab.jsx";
+import { AdminOrdersTab } from "../components/admin/AdminOrdersTab.jsx";
 
 function AdminProductsPage() {
   const { getToken } = useAuth();
@@ -58,7 +58,7 @@ function AdminProductsPage() {
       <div className="mt-6">
         {activeTab === "products" && <AdminProductsTab getToken={getToken} />}
         {activeTab === "users" && <AdminUsersTab getToken={getToken} />}
-        {activeTab === "orders" && <div>Orders tab coming soon...</div>}
+        {activeTab === "orders" && <AdminOrdersTab getToken={getToken} />}
       </div>
     </div>
   );

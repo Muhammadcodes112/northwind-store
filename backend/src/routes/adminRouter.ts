@@ -10,6 +10,8 @@ import {
   listAdmins,
   addAdmin,
   removeAdmin,
+  listAdminOrders,
+  updateAdminOrderStatus,
 } from "../controllers/adminController";
 
 const router = Router();
@@ -26,5 +28,8 @@ router.get("/stats", getAdminStats);
 router.get("/admins", listAdmins);
 router.post("/admins", addAdmin);
 router.delete("/admins/:id", removeAdmin);
+
+router.get("/orders", listAdminOrders);
+router.patch("/orders/:id/status", updateAdminOrderStatus);
 
 export default router;

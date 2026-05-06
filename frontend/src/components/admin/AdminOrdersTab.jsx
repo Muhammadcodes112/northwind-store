@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 export function AdminOrdersTab({ getToken }) {
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState("pending");
+  const [confirmDialog, setConfirmDialog] = useState(null);
 
   const { data: ordersData, isLoading } = useQuery({
     queryKey: ["admin", "orders"],
@@ -42,6 +43,18 @@ export function AdminOrdersTab({ getToken }) {
   const totalSalesCents = completedOrders.reduce((sum, o) => sum + o.totalCents, 0);
 
   const displayedOrders = statusFilter === "pending" ? pendingOrders : completedOrders;
+
+  const openConfirm = (order, status) => {
+    setConfirmDialog({
+      order,
+      status,
+      title: status === "completed" ? "Complete this order?" : "Move order back to pending?",
+      description:
+        status === "completed"
+          ? "This marks the order as fulfilled for operations tracking."
+          : "This reopens the order so it appears in pending queue again.",
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -80,6 +93,7 @@ export function AdminOrdersTab({ getToken }) {
               <th>Order ID</th>
               <th>Date</th>
               <th>Customer</th>
+              <th>Location</th>
               <th>Total</th>
               <th>Status</th>
               <th className="text-right">Actions</th>
@@ -88,11 +102,11 @@ export function AdminOrdersTab({ getToken }) {
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan="6" className="text-center py-4">Loading...</td>
+                <td colSpan="7" className="text-center py-4">Loading...</td>
               </tr>
             ) : displayedOrders.length === 0 ? (
               <tr>
-                <td colSpan="6" className="text-center py-8 text-base-content/50">
+                <td colSpan="7" className="text-center py-8 text-base-content/50">
                   No {statusFilter} orders found
                 </td>
               </tr>
@@ -102,8 +116,11 @@ export function AdminOrdersTab({ getToken }) {
                   <td className="font-mono text-sm">{order.id.slice(0, 8)}</td>
                   <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                   <td>
-                    <div>{order.user?.displayName || "Unknown"}</div>
-                    <div className="text-xs opacity-60">{order.user?.email}</div>
+                    <div className="text-xs">{order.user?.email || "No email"}</div>
+                    <div className="text-xs opacity-60">{order.user?.whatsappNumber || "No phone"}</div>
+                  </td>
+                  <td className="max-w-44 truncate" title={order.deliveryLocation || ""}>
+                    {order.deliveryLocation || "Not provided"}
                   </td>
                   <td className="font-medium">{formatPrice(order.totalCents, "ngn")}</td>
                   <td>
@@ -119,11 +136,7 @@ export function AdminOrdersTab({ getToken }) {
                     {order.status !== "completed" && (
                       <button
                         className="btn btn-sm btn-success gap-1"
-                        onClick={() => {
-                          if(window.confirm(`Mark order #${order.id.slice(0, 8)} as completed?`)) {
-                            updateStatusMutation.mutate({ id: order.id, status: "completed" });
-                          }
-                        }}
+                        onClick={() => openConfirm(order, "completed")}
                         disabled={updateStatusMutation.isPending}
                       >
                         <CheckCircleIcon className="size-4" /> Complete
@@ -132,11 +145,7 @@ export function AdminOrdersTab({ getToken }) {
                     {order.status === "completed" && (
                       <button
                         className="btn btn-sm btn-ghost gap-1"
-                        onClick={() => {
-                          if(window.confirm(`Move order #${order.id.slice(0, 8)} back to pending?`)) {
-                            updateStatusMutation.mutate({ id: order.id, status: "pending" });
-                          }
-                        }}
+                        onClick={() => openConfirm(order, "pending")}
                         disabled={updateStatusMutation.isPending}
                       >
                         <ClockIcon className="size-4" /> Revert
@@ -149,6 +158,37 @@ export function AdminOrdersTab({ getToken }) {
           </tbody>
         </table>
       </div>
+
+      {confirmDialog ? (
+        <div className="modal modal-open bg-neutral/70 backdrop-blur-sm">
+          <div className="modal-box max-w-md">
+            <h3 className="text-lg font-bold">{confirmDialog.title}</h3>
+            <p className="mt-2 text-sm text-base-content/70">{confirmDialog.description}</p>
+            <div className="mt-3 rounded-lg border border-base-300 p-3 text-sm">
+              <p className="font-mono">Order #{confirmDialog.order.id.slice(0, 8)}</p>
+              <p className="mt-1">{confirmDialog.order.user?.email || "No email"}</p>
+              <p className="text-base-content/60">{confirmDialog.order.deliveryLocation || "No location provided"}</p>
+            </div>
+            <div className="modal-action">
+              <button className="btn btn-ghost" onClick={() => setConfirmDialog(null)}>
+                Cancel
+              </button>
+              <button
+                className={`btn ${confirmDialog.status === "completed" ? "btn-success" : "btn-warning"}`}
+                onClick={() => {
+                  updateStatusMutation.mutate({
+                    id: confirmDialog.order.id,
+                    status: confirmDialog.status,
+                  });
+                  setConfirmDialog(null);
+                }}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

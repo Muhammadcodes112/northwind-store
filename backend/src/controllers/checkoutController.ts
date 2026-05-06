@@ -20,6 +20,7 @@ const cartSchema = z.object({
     )
     .min(1),
   method: z.enum(["paystack", "pod"]).default("paystack"),
+  deliveryLocation: z.string().trim().min(3),
 });
 
 export async function createCheckout(req: Request, res: Response, next: NextFunction) {
@@ -105,6 +106,7 @@ export async function createCheckout(req: Request, res: Response, next: NextFunc
             userId: localUser.id,
             status: "pending",
             totalCents: totalCents,
+            deliveryLocation: parsed.data.deliveryLocation,
             // no paystack reference for POD
           })
           .returning();
@@ -119,34 +121,6 @@ export async function createCheckout(req: Request, res: Response, next: NextFunc
         }
       });
 
-      // Email Admins for POD
-      try {
-        const { users } = await import("../db/schema.js");
-        const adminUsers = await db.select().from(users).where(eq(users.role, "admin"));
-        const adminEmails = adminUsers.map((u) => u.email).filter(Boolean);
-
-        if (adminEmails.length > 0) {
-          const resendKey = process.env.RESEND_API_KEY;
-          if (resendKey) {
-            // @ts-ignore
-            const { Resend } = await import("resend");
-            const resend = new Resend(resendKey);
-            await resend.emails.send({
-              from: "Emporium Corner Orders <onboarding@resend.dev>",
-              to: adminEmails,
-              subject: "New Pay-on-Delivery Order - Emporium Corner",
-              html: `<h2>New Order Placed (Pay on Delivery)</h2>
-                <p>A new order has been placed via Pay on Delivery.</p>
-                <p><strong>Amount:</strong> NGN ${(totalCents / 100).toFixed(2)}</p>
-                <p>Please check the admin dashboard to fulfill this order and collect payment on delivery.</p>
-              `,
-            });
-          }
-        }
-      } catch (e) {
-        console.error("Error emailing admins for POD:", e);
-      }
-
       res.json({ checkoutUrl: successUrl.replace("{CHECKOUT_ID}", session.id) });
       return;
     }
@@ -154,7 +128,10 @@ export async function createCheckout(req: Request, res: Response, next: NextFunc
     const checkout = await paystackInitializeCheckout(env, {
       email: localUser.email || "customer@example.com",
       amount: totalCents, // Paystack amounts are in kobo, cents are equivalent (1/100 of base currency)
-      metadata: { checkout_session_id: session.id },
+      metadata: {
+        checkout_session_id: session.id,
+        delivery_location: parsed.data.deliveryLocation,
+      },
       callback_url: successUrl.replace("{CHECKOUT_ID}", session.id),
     });
 

@@ -30,6 +30,7 @@ function CartPage() {
   } = useCartPage();
 
   const [podConfirmOpen, setPodConfirmOpen] = useState(false);
+  const [deliveryLocation, setDeliveryLocation] = useState("");
 
   return (
     <div className="text-left">
@@ -128,6 +129,18 @@ function CartPage() {
           </ul>
 
           <aside className="card border border-base-300 bg-base-100 p-6 shadow-md">
+            <label className="form-control mb-4">
+              <div className="label pb-1">
+                <span className="label-text text-xs sm:text-sm font-medium">Delivery Location</span>
+              </div>
+              <textarea
+                className="textarea textarea-bordered min-h-20"
+                placeholder="Enter your delivery address/location"
+                value={deliveryLocation}
+                onChange={(e) => setDeliveryLocation(e.target.value)}
+              />
+            </label>
+
             <div className="flex justify-between text-[10px] sm:text-sm">
               <span className="text-base-content/70">Subtotal</span>
               <span className="font-semibold text-base-content">
@@ -139,7 +152,7 @@ function CartPage() {
               <div className="mt-6 space-y-2">
                 <button
                   type="button"
-                  onClick={() => checkout("paystack")}
+                  onClick={() => checkout("paystack", deliveryLocation.trim())}
                   disabled={checkoutLoading}
                   aria-busy={checkoutLoading}
                   className="btn btn-primary w-full gap-2"
@@ -201,7 +214,7 @@ function CartPage() {
               className="btn btn-primary"
               onClick={() => {
                 setPodConfirmOpen(false);
-                checkout("pod");
+                checkout("pod", deliveryLocation.trim());
               }}
             >
               Confirm Order

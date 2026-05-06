@@ -1,7 +1,7 @@
 import { Show, SignInButton, useAuth, UserButton } from "@clerk/react";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "../lib/api";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 
 import {
@@ -46,6 +46,7 @@ const SearchForm = ({ className }) => (
 
 const Navbar = () => {
   const { getToken, isSignedIn } = useAuth();
+  const navigate = useNavigate();
   const profileHoverAnimation = "transition-all duration-300 hover:scale-110 hover:shadow-md";
 
   const [theme, setTheme] = useState(() => {
@@ -108,6 +109,7 @@ const Navbar = () => {
               <Show when={"signed-in"}>
                 <UserButton appearance={{ elements: { avatarBox: `h-8 w-8 ring-2 ring-base-300 ${profileHoverAnimation}` } }}>
                   <UserButton.MenuItems>
+                    <UserButton.Action label="Manage account" onClick={() => navigate("/account")} />
                     <UserButton.Action 
                       label={theme === "light" ? "Dark Mode" : "Light Mode"} 
                       labelIcon={theme === "light" ? <MoonIcon className="size-4" /> : <SunIcon className="size-4" />} 
@@ -176,6 +178,7 @@ const Navbar = () => {
               <div className="flex items-center gap-2 border-l border-base-300 pl-3">
                 <UserButton appearance={{ elements: { avatarBox: `h-10 w-10 ring-2 ring-base-300 ${profileHoverAnimation}` } }}>
                   <UserButton.MenuItems>
+                    <UserButton.Action label="Manage account" onClick={() => navigate("/account")} />
                     <UserButton.Action 
                       label={theme === "light" ? "Dark Mode" : "Light Mode"} 
                       labelIcon={theme === "light" ? <MoonIcon className="size-4" /> : <SunIcon className="size-4" />} 

@@ -35,12 +35,13 @@ export default function useCartPage() {
     return sum + p.priceCents * line.quantity;
   }, 0);
 
-  async function checkout(method = "paystack") {
+  async function checkout(method = "paystack", deliveryLocation = "") {
     setCheckoutLoading(true);
 
     try {
       const body = {
         method,
+        deliveryLocation,
         items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
       };
 

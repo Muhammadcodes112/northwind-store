@@ -19,6 +19,11 @@ export function useOrderDetailPage() {
     queryFn: () => apiFetch(`/api/whatsapp/random-admin`, { getToken }),
   });
 
+  const { data: meData } = useQuery({
+    queryKey: ["me"],
+    queryFn: () => apiFetch("/api/me", { getToken }),
+  });
+
   const cancelOrderMutation = useMutation({
     mutationFn: async () => {
       return apiFetch(`/api/orders/${id}/cancel`, {
@@ -50,6 +55,7 @@ export function useOrderDetailPage() {
   const items = data?.items ?? [];
   const paid = order?.status === "paid";
   const whatsappNumber = whatsappData?.whatsappNumber ?? "08133180063";
+  const customerPhone = meData?.user?.whatsappNumber ?? "";
 
   return {
     id,
@@ -59,6 +65,7 @@ export function useOrderDetailPage() {
     isLoading,
     error,
     whatsappNumber,
+    customerPhone,
     isLoadingWhatsapp,
     cancelOrder: () => cancelOrderMutation.mutate(),
     isCancelling: cancelOrderMutation.isPending,

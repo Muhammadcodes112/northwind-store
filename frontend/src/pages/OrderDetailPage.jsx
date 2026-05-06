@@ -20,6 +20,7 @@ function OrderDetailPage() {
     isLoading,
     error,
     whatsappNumber,
+    customerPhone,
     cancelOrder,
     isCancelling,
     completeOrder,
@@ -82,6 +83,7 @@ function OrderDetailPage() {
                   order={order} 
                   items={items}
                   whatsappNumber={whatsappNumber} 
+                  customerPhone={customerPhone}
                   onCancelOrder={cancelOrder} 
                   isCancelling={isCancelling}
                   onPaymentComplete={completeOrder}

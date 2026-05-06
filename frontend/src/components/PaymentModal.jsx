@@ -8,6 +8,7 @@ export function PaymentModal({
   order,
   items,
   whatsappNumber,
+  customerPhone,
   onCancelOrder,
   isCancelling,
   onPaymentComplete,
@@ -18,6 +19,7 @@ export function PaymentModal({
   // Step 2: Payment Details with timer
   const [step, setStep] = useState(0);
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
+  const [phoneRequiredOpen, setPhoneRequiredOpen] = useState(false);
 
   useEffect(() => {
     let timer;
@@ -34,6 +36,10 @@ export function PaymentModal({
   }, [step, timeLeft]);
 
   const openModal = () => {
+    if (!customerPhone?.trim()) {
+      setPhoneRequiredOpen(true);
+      return;
+    }
     setStep(1);
     setTimeLeft(600); // Reset timer
   };
@@ -198,6 +204,23 @@ export function PaymentModal({
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {phoneRequiredOpen && (
+        <div className="modal modal-open bg-neutral/70 backdrop-blur-sm">
+          <div className="modal-box max-w-md border border-warning/30">
+            <h3 className="text-xl font-bold text-warning">Phone Number Needed</h3>
+            <p className="mt-3 text-sm text-base-content/75">
+              Add your phone number first from profile menu → Manage account, then continue with
+              payment.
+            </p>
+            <div className="modal-action">
+              <button className="btn btn-warning" onClick={() => setPhoneRequiredOpen(false)}>
+                Okay
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -70,6 +70,7 @@ export async function paystackWebhookHandler(req: Request, res: Response) {
             userId: session.userId,
             status: "paid",
             paystackReference: data.reference,
+            deliveryLocation: metadata.delivery_location ?? null,
             totalCents: session.totalCents,
           })
           .returning();
@@ -86,37 +87,6 @@ export async function paystackWebhookHandler(req: Request, res: Response) {
       
       console.log(`Order created for Paystack ref ${data.reference}`);
 
-      // Email Admins
-      try {
-        const { users } = await import("../db/schema.js");
-        const adminUsers = await db.select().from(users).where(eq(users.role, "admin"));
-        const adminEmails = adminUsers.map((u) => u.email).filter(Boolean);
-
-        if (adminEmails.length > 0) {
-          const resendKey = process.env.RESEND_API_KEY;
-          if (resendKey) {
-            // @ts-ignore
-            const { Resend } = await import("resend");
-            const resend = new Resend(resendKey);
-            await resend.emails.send({
-              from: "Emporium Corner Orders <onboarding@resend.dev>", // default testing email for Resend
-              to: adminEmails,
-              subject: "New Order Received - Emporium Corner",
-              html: `<h2>New Order Paid</h2>
-                <p>A new order has been placed and confirmed paid via Paystack.</p>
-                <p><strong>Paystack Ref:</strong> ${data.reference}</p>
-                <p><strong>Amount:</strong> NGN ${(session.totalCents / 100).toFixed(2)}</p>
-                <p>Please check the admin dashboard to fulfill this order.</p>
-              `,
-            });
-            console.log("Emailed admins successfully:", adminEmails);
-          } else {
-            console.log("RESEND_API_KEY not set. Would have emailed admins:", adminEmails);
-          }
-        }
-      } catch (e) {
-        console.error("Error emailing admins:", e);
-      }
     }
 
     res.status(200).send("OK");

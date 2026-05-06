@@ -58,7 +58,9 @@ export const orders = pgTable("orders", {
   polarCheckoutId: text("polar_checkout_id"),
   polarOrderId: text("polar_order_id").unique(),
   paystackReference: text("paystack_reference").unique(),
+  deliveryLocation: text("delivery_location"),
   totalCents: integer("total_cents").notNull().default(0),
+  adminNotifiedAt: timestamp("admin_notified_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

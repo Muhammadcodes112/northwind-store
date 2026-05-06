@@ -10,7 +10,6 @@ import {
   SettingsIcon,
   ShoppingBagIcon,
   ShoppingCartIcon,
-  StoreIcon,
   MoonIcon,
   SunIcon,
 } from "lucide-react";
@@ -30,7 +29,7 @@ const SearchForm = ({ className }) => (
       name="q"
       type="text"
       placeholder="Search..."
-      className="input input-sm input-bordered w-full pl-8 transition-all duration-300"
+      className="input input-sm input-bordered rounded-full w-full pl-8 transition-all duration-300"
       defaultValue={new URLSearchParams(window.location.search).get("q") || ""}
     />
     <svg
@@ -74,14 +73,15 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b border-base-300 bg-base-100/95 shadow-sm backdrop-blur-md">
-      <div className="mx-auto flex flex-col gap-2 max-w-7xl px-4 py-2.5 md:px-6 md:py-3">
-        <div className="navbar p-0 min-h-0 flex-col lg:flex-row items-center justify-between gap-3 lg:gap-0">
+      <div className="mx-auto flex flex-col gap-1.5 max-w-7xl px-4 py-2 md:px-6 md:py-3">
+        <div className="navbar p-0 min-h-0 flex-col lg:flex-row items-center justify-between gap-2.5 lg:gap-0">
           <div className="w-full lg:w-auto flex items-center justify-between">
             <Link
               to="/"
-              className="btn btn-ghost gap-2 px-1 lg:px-2 font-mono text-lg lg:text-xl font-semibold tracking-wide hover:bg-transparent"
+              className="btn btn-ghost gap-2 px-1 lg:px-2 font-mono text-sm sm:text-base lg:text-xl font-semibold tracking-wide hover:bg-transparent"
             >
-              <img src="/logo.jpg" alt="Logo" className={`h-8 w-8 lg:h-10 lg:w-10 object-cover rounded-full ring-2 ring-base-300 hover:ring-primary shadow-sm ${profileHoverAnimation}`} onError={(e) => { e.target.onerror = null; e.target.src = "/logo.png"; }} />
+              <img src="/logo.jpg" alt="Logo" className={`h-7 w-7 lg:h-10 lg:w-10 object-cover rounded-full ring-2 ring-base-300 shadow-sm ${profileHoverAnimation}`} onError={(e) => { e.target.onerror = null; e.target.src = "/logo.png"; }} />
+              <span>The Emporium Corner</span>
             </Link>
 
             <div className="flex items-center gap-1 lg:hidden">

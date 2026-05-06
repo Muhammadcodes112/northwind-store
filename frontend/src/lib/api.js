@@ -38,7 +38,9 @@ export async function apiFetch(path, opts = {}) {
     throw e;
   }
 
-  const data = await res.json();
+  const contentType = res.headers.get("content-type") || "";
+  const isJson = contentType.includes("application/json");
+  const data = isJson ? await res.json() : null;
 
   Sentry.addBreadcrumb({
     category: "api",
@@ -48,7 +50,10 @@ export async function apiFetch(path, opts = {}) {
   });
 
   if (!res.ok) {
-    const msg = typeof data?.error === "string" ? data.error : res.statusText;
+    let msg = typeof data?.error === "string" ? data.error : res.statusText;
+    if (!isJson) {
+      msg = "Unexpected non-JSON response from server";
+    }
     const err = new Error(typeof msg === "string" ? msg : "Request failed");
 
     if (res.status >= 500) {
@@ -61,5 +66,5 @@ export async function apiFetch(path, opts = {}) {
     throw err;
   }
 
-  return data;
+  return data ?? {};
 }

@@ -19,12 +19,12 @@ export function AdminOrdersTab({ getToken }) {
     mutationFn: ({ id, status }) =>
       apiFetch(`/api/admin/orders/${id}/status`, {
         method: "PATCH",
-        body: JSON.stringify({ status }),
+        body: { status },
         getToken,
       }),
     onSuccess: () => {
       toast.success("Order status updated");
-      queryClient.invalidateQueries(["admin", "orders"]);
+      queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
     },
     onError: (err) => {
       toast.error(err.message || "Failed to update order status");

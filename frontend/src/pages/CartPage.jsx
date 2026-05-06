@@ -33,7 +33,7 @@ function CartPage() {
 
   return (
     <div className="text-left">
-      <h1 className="mb-8 flex items-center gap-2 text-3xl font-bold text-base-content">
+      <h1 className="mb-6 sm:mb-8 flex items-center gap-2 text-2xl sm:text-3xl font-bold text-base-content">
         <ShoppingCartIcon className="size-8 text-primary" aria-hidden />
         Cart
       </h1>
@@ -67,7 +67,7 @@ function CartPage() {
                 </figure>
                 <div className="card-body min-w-0 flex-row flex-wrap items-center justify-between gap-4">
                   <div className="min-w-0 flex-1">
-                    <div className="card-title text-xs sm:text-sm leading-tight">
+                    <div className="card-title text-[10px] sm:text-sm leading-tight">
                       {p ? (
                         <Link to={`/product/${p.slug}`} className="link-hover link-primary line-clamp-2">
                           {p.name}
@@ -82,7 +82,7 @@ function CartPage() {
                       </p>
                     ) : null}
                     <div className="mt-2 flex flex-wrap items-center gap-3">
-                      <span className="text-xs sm:text-sm text-base-content/70">Qty</span>
+                      <span className="text-[10px] sm:text-sm text-base-content/70">Qty</span>
                       <div className="join border border-base-300">
                         <button
                           type="button"
@@ -93,7 +93,7 @@ function CartPage() {
                           <MinusIcon className="size-4" aria-hidden />
                         </button>
                         <span
-                          className="join-item flex min-w-8 sm:min-w-10 items-center justify-center bg-base-200 px-2 sm:px-3 text-xs sm:text-sm font-medium tabular-nums text-base-content"
+                          className="join-item flex min-w-8 sm:min-w-10 items-center justify-center bg-base-200 px-2 sm:px-3 text-[10px] sm:text-sm font-medium tabular-nums text-base-content"
                           aria-live="polite"
                         >
                           {line.quantity}
@@ -119,7 +119,7 @@ function CartPage() {
                       </button>
                     </div>
                   </div>
-                  <div className="text-right text-sm sm:text-base font-semibold text-base-content">
+                  <div className="text-right text-xs sm:text-base font-semibold text-base-content">
                     {p ? formatPrice(p.priceCents * line.quantity, p.currency) : "-"}
                   </div>
                 </div>
@@ -128,7 +128,7 @@ function CartPage() {
           </ul>
 
           <aside className="card border border-base-300 bg-base-100 p-6 shadow-md">
-            <div className="flex justify-between text-xs sm:text-sm">
+            <div className="flex justify-between text-[10px] sm:text-sm">
               <span className="text-base-content/70">Subtotal</span>
               <span className="font-semibold text-base-content">
                 {formatPrice(subtotal, lines[0]?.product?.currency ?? "usd")}

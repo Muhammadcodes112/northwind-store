@@ -12,7 +12,7 @@ export function MobileBottomNav() {
 
   return (
     <div 
-      className="fixed bottom-0 left-0 right-0 z-[100] flex items-center justify-around bg-base-100 border-t border-base-200 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] md:hidden pt-2"
+      className="fixed bottom-0 left-0 right-0 z-[100] flex items-center justify-around bg-base-100 border-t border-base-200 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] lg:hidden pt-2 rounded-t-2xl"
       style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
     >
       <Link to="/" className={`flex flex-col items-center justify-center gap-1 w-full h-full pb-1 ${isActive("/") ? "text-primary" : "text-base-content/70"}`}>

@@ -8,7 +8,7 @@ function Layout({ children }) {
       <Navbar />
 
       {/* Add extra bottom padding on mobile to account for the fixed bottom nav */}
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 pb-24 md:pb-10 md:px-6 md:py-10">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 pb-24 lg:pb-10 lg:px-6 lg:py-10">
         {children}
       </main>
 

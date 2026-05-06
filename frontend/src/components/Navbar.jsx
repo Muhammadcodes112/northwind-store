@@ -74,47 +74,75 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 border-b border-base-300 bg-base-100/95 shadow-sm backdrop-blur-md">
       <div className="mx-auto flex flex-col gap-2 max-w-7xl px-4 py-2.5 md:px-6 md:py-3">
-        <div className="navbar p-0 min-h-0 flex-1 flex items-center justify-between">
-          <div className="flex-1 flex items-center gap-2">
+        <div className="navbar p-0 min-h-0 flex-col lg:flex-row items-center justify-between gap-3 lg:gap-0">
+          <div className="w-full lg:w-auto flex items-center justify-between">
             <Link
               to="/"
-              className="btn btn-ghost gap-2 px-2 font-mono text-lg font-semibold uppercase tracking-wide md:text-xl"
+              className="btn btn-ghost gap-2 px-1 lg:px-2 font-mono text-lg lg:text-xl font-semibold uppercase tracking-wide"
             >
-              <span className="flex size-10 items-center justify-center rounded-lg bg-primary/15 p-1 text-primary">
-                <StoreIcon className="size-8" aria-hidden />
+              <span className="flex size-8 lg:size-10 items-center justify-center rounded-lg bg-primary/15 p-1 text-primary">
+                <StoreIcon className="size-6 lg:size-8" aria-hidden />
               </span>
-              <span className="leading-none hidden sm:inline">Emporium Corner</span>
+              <span className="leading-none text-[11px] sm:text-sm lg:text-xl">The Emporium Corner</span>
             </Link>
-            {/* Mobile Search Bar inline */}
-            <SearchForm className="md:hidden w-36 sm:w-48" />
+
+            <div className="flex items-center gap-1 lg:hidden">
+              {role === "admin" ? (
+                <Link to="/admin" className="btn btn-ghost px-2 gap-1 font-medium text-secondary">
+                  <SettingsIcon className="size-5" aria-hidden />
+                  <span className="text-sm">Admin</span>
+                </Link>
+              ) : null}
+              
+              <Show when={"signed-out"}>
+                <button onClick={toggleTheme} className="btn btn-ghost btn-circle btn-sm">
+                  {theme === "light" ? <MoonIcon className="size-4" /> : <SunIcon className="size-4" />}
+                </button>
+              </Show>
+              <Show when={"signed-in"}>
+                <UserButton appearance={{ elements: { avatarBox: "h-8 w-8 ring-2 ring-base-300" } }}>
+                  <UserButton.MenuItems>
+                    <UserButton.Action 
+                      label={theme === "light" ? "Dark Mode" : "Light Mode"} 
+                      labelIcon={theme === "light" ? <MoonIcon className="size-4" /> : <SunIcon className="size-4" />} 
+                      onClick={toggleTheme} 
+                    />
+                  </UserButton.MenuItems>
+                </UserButton>
+              </Show>
+            </div>
           </div>
 
-          <nav className="flex items-center gap-1 md:gap-1.5">
-            <Link to="/" className="btn btn-ghost gap-2 font-medium hidden md:inline-flex">
+          <div className="w-full lg:hidden flex justify-center">
+            <SearchForm className="w-[40vw]" />
+          </div>
+
+          <nav className="hidden lg:flex items-center gap-1.5">
+            <Link to="/" className="btn btn-ghost gap-2 font-medium">
               <ShoppingBagIcon className="size-6 opacity-90" aria-hidden />
               <span>Shop</span>
             </Link>
 
             {/* Desktop Search Bar */}
-            <SearchForm className="hidden md:block w-48 focus-within:w-64" />
+            <SearchForm className="w-48 focus-within:w-64" />
 
             <Show when={"signed-in"}>
-              <Link to="/orders" className="btn btn-ghost gap-2 font-medium hidden md:inline-flex">
+              <Link to="/orders" className="btn btn-ghost gap-2 font-medium">
                 <PackageIcon className="size-6 opacity-90" aria-hidden />
                 <span>Orders</span>
               </Link>
 
               {role === "admin" ? (
-                <Link to="/admin" className="btn btn-ghost px-2 gap-1 md:gap-2 font-medium text-secondary">
-                  <SettingsIcon className="size-5 md:size-6" aria-hidden />
-                  <span className="text-sm md:text-base">Admin</span>
+                <Link to="/admin" className="btn btn-ghost px-2 gap-2 font-medium text-secondary">
+                  <SettingsIcon className="size-6" aria-hidden />
+                  <span className="text-base">Admin</span>
                 </Link>
               ) : null}
             </Show>
 
             <Link
               to="/cart"
-              className="btn btn-ghost gap-2 font-medium indicator hidden md:inline-flex"
+              className="btn btn-ghost gap-2 font-medium indicator"
               aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : "Cart"}
             >
               {cartCount > 0 ? (
@@ -126,7 +154,6 @@ const Navbar = () => {
               <span>Cart</span>
             </Link>
 
-            {/* Theme Toggle for signed-out users */}
             <Show when={"signed-out"}>
               <button onClick={toggleTheme} className="btn btn-ghost btn-circle">
                 {theme === "light" ? <MoonIcon className="size-5" /> : <SunIcon className="size-5" />}
@@ -151,7 +178,7 @@ const Navbar = () => {
                   </UserButton.MenuItems>
                 </UserButton>
                 {role === "support" || role === "admin" ? (
-                  <span className="badge badge-primary badge-sm hidden capitalize md:inline-flex">
+                  <span className="badge badge-primary badge-sm capitalize">
                     {role}
                   </span>
                 ) : null}

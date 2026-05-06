@@ -69,7 +69,7 @@ function OrderDetailPage() {
 
               {order.status === "pending" && (
                 <a
-                  href={`https://wa.me/2348000000000?text=Hello%20Admin,%20I%20have%20placed%20a%20Pay%20on%20Delivery%20order%20%23${order.id.slice(0, 8)}.%20Here%20is%20my%20payment%20receipt!`}
+                  href={`https://wa.me/2348133180063?text=Hello%20Admin,%20I%20have%20placed%20a%20Pay%20on%20Delivery%20order%20%23${order.id.slice(0, 8)}.%20Here%20is%20my%20payment%20receipt!`}
                   target="_blank"
                   rel="noreferrer"
                   className="btn btn-success btn-sm gap-2 mt-1 w-fit lg:ml-auto shadow-sm text-white"

@@ -10,11 +10,10 @@ import {
   MessageCircleIcon,
 } from "lucide-react";
 import { formatOrderWhen, formatPrice } from "../utils/format";
-
-const tabClass = ({ isActive }) => `tab gap-2 whitespace-nowrap ${isActive ? "tab-active" : ""}`;
+import { PaymentModal } from "../components/PaymentModal";
 
 function OrderDetailPage() {
-  const { id, order, items, paid, isLoading, error } = useOrderDetailPage();
+  const { order, items, paid, isLoading, error, whatsappNumber, cancelOrder, isCancelling } = useOrderDetailPage();
 
   if (isLoading) {
     return <OrderDetailSkeleton />;
@@ -68,15 +67,12 @@ function OrderDetailPage() {
               </span>
 
               {order.status === "pending" && (
-                <a
-                  href={`https://wa.me/2348133180063?text=Hello%20Admin,%20I%20have%20placed%20a%20Pay%20on%20Delivery%20order%20%23${order.id.slice(0, 8)}.%20Here%20is%20my%20payment%20receipt!`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn btn-success btn-sm gap-2 mt-1 w-fit lg:ml-auto shadow-sm text-white"
-                >
-                  <MessageCircleIcon className="size-4" aria-hidden />
-                  Send Receipt via WhatsApp
-                </a>
+                <PaymentModal 
+                  order={order} 
+                  whatsappNumber={whatsappNumber} 
+                  onCancelOrder={cancelOrder} 
+                  isCancelling={isCancelling} 
+                />
               )}
 
               <div>

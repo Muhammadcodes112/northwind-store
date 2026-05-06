@@ -8,12 +8,11 @@ export default function Footer() {
         <div className="grid gap-10 md:grid-cols-4">
           <div>
             <div className="flex items-center gap-2 text-sm sm:text-base font-semibold text-base-content">
-              <TruckIcon className="size-8 text-primary" aria-hidden />
-              Emporium Corner
+              <img src="/logo.jpg" alt="Logo" className="h-8 w-8 object-cover rounded-full ring-2 ring-base-300 hover:scale-110 transition-all duration-300" onError={(e) => { e.target.onerror = null; e.target.src = "/logo.png"; }} />
+              The Emporium Corner
             </div>
             <p className="mt-3 text-xs sm:text-sm leading-relaxed text-base-content/65">
-              Curated hardware and workspace tools. Paid orders include priority support; chat with
-              our team and join a video call when we share a link.
+              Your World All In One Marketplace. We provide a curated selection of products to meet all your needs.
             </p>
           </div>
 
@@ -65,7 +64,7 @@ export default function Footer() {
 
         <div className="mt-10 space-y-4 border-t border-base-300 pt-6">
           <p className="text-center text-[10px] sm:text-xs text-base-content/50">
-            © {new Date().getFullYear()} Emporium Corner · All prices in NGN
+            © {new Date().getFullYear()} The Emporium Corner · All prices in NGN
           </p>
         </div>
       </div>

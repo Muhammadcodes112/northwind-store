@@ -7,15 +7,11 @@ import { useHomeCatalog } from "../hooks/useHomeCatalog";
 function HomePage() {
   const {
     products,
-    categories,
     categoryChipsLoading,
     categoryFilter,
     error,
-    loadingCategories,
     loadingList,
     setCategory,
-    searchQuery,
-    setSearchQuery,
   } = useHomeCatalog();
 
   return (

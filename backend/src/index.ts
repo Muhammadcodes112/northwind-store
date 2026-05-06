@@ -17,6 +17,7 @@ import meRouter from "./routes/meRouter";
 import chekoutRouter from "./routes/chekoutRouter";
 import adminRouter from "./routes/adminRouter";
 import orderRouter from "./routes/orderRouter";
+import whatsappRouter from "./routes/whatsappRouter";
 
 import { polarWebhookHandler } from "./webhooks/polar";
 import { sentryClerkUserMiddleware } from "./middleware/sentryClerkUser";
@@ -53,6 +54,7 @@ app.use("/api/products", productRouter);
 app.use("/api/checkout", chekoutRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/orders", orderRouter);
+app.use("/api/whatsapp", whatsappRouter);
 
 const publicDir = path.join(process.cwd(), "public");
 if (fs.existsSync(publicDir)) {

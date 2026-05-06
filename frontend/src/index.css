@@ -2,9 +2,18 @@
 /* @plugin "daisyui"; */
 
 @plugin "daisyui" {
-  themes: light --default, forest;
+  themes: light --default, dark;
 }
 
 :root, [data-theme="light"] {
-  --color-primary: #1eb854;
+  --color-primary: #c0994f;
+  --color-secondary: #0c1d35;
+}
+
+[data-theme="dark"] {
+  --color-primary: #c0994f;
+  --color-secondary: #0c1d35;
+  --color-base-100: #0c1d35;
+  --color-base-200: #122442;
+  --color-base-300: #182e54;
 }

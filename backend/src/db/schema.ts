@@ -1,7 +1,7 @@
 import { pgTable, text, integer, timestamp, uuid, boolean, jsonb } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-export type OrderStatus = "pending" | "paid" | "failed" | "completed";
+export type OrderStatus = "pending" | "paid" | "failed" | "completed" | "cancelled";
 export type UserRole = "customer" | "support" | "admin";
 
 export type CheckoutSessionLine = {
@@ -16,6 +16,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().default(""),
   displayName: text("display_name"),
   role: text("role").$type<UserRole>().notNull().default("customer"),
+  whatsappNumber: text("whatsapp_number"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

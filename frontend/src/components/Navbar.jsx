@@ -58,7 +58,7 @@ const Navbar = () => {
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "forest" : "light"));
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
   const { data: meData } = useQuery({
@@ -78,12 +78,9 @@ const Navbar = () => {
           <div className="w-full lg:w-auto flex items-center justify-between">
             <Link
               to="/"
-              className="btn btn-ghost gap-2 px-1 lg:px-2 font-mono text-lg lg:text-xl font-semibold uppercase tracking-wide"
+              className="btn btn-ghost gap-2 px-1 lg:px-2 font-mono text-lg lg:text-xl font-semibold tracking-wide hover:bg-transparent"
             >
-              <span className="flex size-8 lg:size-10 items-center justify-center rounded-lg bg-primary/15 p-1 text-primary">
-                <StoreIcon className="size-6 lg:size-8" aria-hidden />
-              </span>
-              <span className="leading-none text-[11px] sm:text-sm lg:text-xl">The Emporium Corner</span>
+              <img src="/logo.jpg" alt="Logo" className="h-8 w-8 lg:h-10 lg:w-10 object-cover rounded-full ring-2 ring-base-300 hover:ring-primary hover:scale-110 transition-all duration-300 shadow-sm" onError={(e) => { e.target.onerror = null; e.target.src = "/logo.png"; }} />
             </Link>
 
             <div className="flex items-center gap-1 lg:hidden">

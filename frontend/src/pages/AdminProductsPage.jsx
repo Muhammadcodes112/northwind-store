@@ -3,10 +3,11 @@ import { useAuth } from "@clerk/react";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "../lib/api.js";
 import { Navigate } from "react-router";
-import { LayoutDashboardIcon, PackageIcon, ShoppingCartIcon, UsersIcon } from "lucide-react";
+import { LayoutDashboardIcon, PackageIcon, ShoppingCartIcon, UsersIcon, SettingsIcon } from "lucide-react";
 import { AdminProductsTab } from "../components/admin/AdminProductsTab.jsx";
 import { AdminUsersTab } from "../components/admin/AdminUsersTab.jsx";
 import { AdminOrdersTab } from "../components/admin/AdminOrdersTab.jsx";
+import { AdminSettingsTab } from "../components/admin/AdminSettingsTab.jsx";
 
 function AdminProductsPage() {
   const { getToken } = useAuth();
@@ -27,7 +28,7 @@ function AdminProductsPage() {
         <LayoutDashboardIcon className="size-8 text-secondary" />
         <div>
           <h1 className="text-2xl font-bold text-base-content">Admin Dashboard</h1>
-          <p className="text-sm text-base-content/60">Manage Emporium Corner store</p>
+          <p className="text-sm text-base-content/60">Manage The Emporium Corner store</p>
         </div>
       </div>
 
@@ -53,12 +54,20 @@ function AdminProductsPage() {
         >
           <ShoppingCartIcon className="size-4" /> Orders
         </button>
+        <button
+          role="tab"
+          className={`tab gap-2 ${activeTab === "settings" ? "tab-active" : ""}`}
+          onClick={() => setActiveTab("settings")}
+        >
+          <SettingsIcon className="size-4" /> Settings
+        </button>
       </div>
 
       <div className="mt-6">
         {activeTab === "products" && <AdminProductsTab getToken={getToken} />}
         {activeTab === "users" && <AdminUsersTab getToken={getToken} />}
         {activeTab === "orders" && <AdminOrdersTab getToken={getToken} />}
+        {activeTab === "settings" && <AdminSettingsTab getToken={getToken} />}
       </div>
     </div>
   );

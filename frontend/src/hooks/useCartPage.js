@@ -36,6 +36,10 @@ export default function useCartPage() {
   }, 0);
 
   async function checkout(method = "paystack") {
+    if (method === "pod") {
+      const confirmed = window.confirm("Place your order for Pay on Delivery?\nYou will pay the delivery agent when your items arrive.");
+      if (!confirmed) return;
+    }
     setCheckoutLoading(true);
 
     try {

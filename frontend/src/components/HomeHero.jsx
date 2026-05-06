@@ -45,13 +45,13 @@ export function HomeHero({ products, loading }) {
     <section className="relative w-full max-w-7xl mx-auto overflow-hidden rounded-none md:rounded-xl shadow-sm bg-[#f2f4e6] group">
       <button 
         onClick={() => scroll('left')} 
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-16 w-8 md:h-24 md:w-12 bg-black/5 hover:bg-black/10 flex items-center justify-center transition-colors"
+        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-16 w-8 md:h-24 md:w-12 bg-black/20 backdrop-blur-sm hover:bg-black/40 flex items-center justify-center transition-colors"
       >
         <ChevronLeftIcon className="text-white size-6 md:size-8" />
       </button>
       <button 
         onClick={() => scroll('right')} 
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-16 w-8 md:h-24 md:w-12 bg-black/5 hover:bg-black/10 flex items-center justify-center transition-colors"
+        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-16 w-8 md:h-24 md:w-12 bg-black/20 backdrop-blur-sm hover:bg-black/40 flex items-center justify-center transition-colors"
       >
         <ChevronRightIcon className="text-white size-6 md:size-8" />
       </button>
@@ -84,7 +84,7 @@ export function HomeHero({ products, loading }) {
             {/* Right Content (Polaroid-style Image) */}
             <div className="w-1/2 h-full flex items-center justify-center relative overflow-visible pr-4 md:pr-12">
                {product.imageUrl ? (
-                 <div className="relative w-[135px] h-[135px] sm:w-[170px] sm:h-[170px] md:w-64 md:h-64 bg-white p-1.5 sm:p-2 shadow-2xl transform rotate-[10deg] transition-transform duration-500 group-hover:rotate-[5deg]">
+                 <div className="relative w-[162px] h-[162px] sm:w-[204px] sm:h-[204px] md:w-64 md:h-64 bg-white p-1.5 sm:p-2 shadow-2xl transform rotate-[10deg] transition-transform duration-500 group-hover:rotate-[5deg]">
                    <img
                      src={imageKitOptimizedUrl(product.imageUrl, IK_PRESETS.catalogCard)}
                      alt={product.name}

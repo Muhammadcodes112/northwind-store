@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   HeadphonesIcon,
   LogInIcon,
@@ -27,6 +28,8 @@ function CartPage() {
     setQty,
     subtotal,
   } = useCartPage();
+
+  const [podConfirmOpen, setPodConfirmOpen] = useState(false);
 
   return (
     <div className="text-left">
@@ -151,7 +154,7 @@ function CartPage() {
 
                 <button
                   type="button"
-                  onClick={() => checkout("pod")}
+                  onClick={() => setPodConfirmOpen(true)}
                   disabled={checkoutLoading}
                   className="btn btn-outline btn-primary w-full gap-2"
                 >
@@ -181,6 +184,36 @@ function CartPage() {
           </aside>
         </div>
       )}
+
+      {/* POD Confirmation Modal */}
+      <dialog className={`modal ${podConfirmOpen ? "modal-open" : ""}`}>
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">Confirm Pay on Delivery</h3>
+          <p className="py-4 text-base-content/70">
+            Are you sure you want to place this order? You will pay the delivery agent directly when your items arrive.
+          </p>
+          <div className="modal-action">
+            <button type="button" className="btn btn-ghost" onClick={() => setPodConfirmOpen(false)}>
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => {
+                setPodConfirmOpen(false);
+                checkout("pod");
+              }}
+            >
+              Confirm Order
+            </button>
+          </div>
+        </div>
+        <button
+          type="button"
+          className="modal-backdrop bg-neutral/50"
+          onClick={() => setPodConfirmOpen(false)}
+        />
+      </dialog>
     </div>
   );
 }

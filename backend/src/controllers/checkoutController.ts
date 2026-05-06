@@ -19,6 +19,7 @@ const cartSchema = z.object({
       }),
     )
     .min(1),
+  method: z.enum(["paystack", "pod"]).default("paystack"),
 });
 
 export async function createCheckout(req: Request, res: Response, next: NextFunction) {
@@ -36,8 +37,8 @@ export async function createCheckout(req: Request, res: Response, next: NextFunc
       return;
     }
 
-    // polar access token is required, but we are switching to paystack
-    if (!env.PAYSTACK_SECRET_KEY) {
+    // paystack configuration check only if method is paystack
+    if (parsed.data.method === "paystack" && !env.PAYSTACK_SECRET_KEY) {
       res.status(503).json({ error: "Payments are not configured (Paystack secret key missing)" });
       return;
     }
@@ -93,6 +94,62 @@ export async function createCheckout(req: Request, res: Response, next: NextFunc
       .returning();
 
     const successUrl = `${env.FRONTEND_URL}/checkout/return?checkout_id={CHECKOUT_ID}`;
+
+    if (parsed.data.method === "pod") {
+      // Pay on delivery: create the order immediately as pending
+      const { orders, orderItems } = await import("../db/schema.js");
+      await db.transaction(async (tx) => {
+        const [order] = await tx
+          .insert(orders)
+          .values({
+            userId: localUser.id,
+            status: "pending",
+            totalCents: totalCents,
+            // no paystack reference for POD
+          })
+          .returning();
+
+        for (const line of lines) {
+          await tx.insert(orderItems).values({
+            orderId: order.id,
+            productId: line.productId,
+            quantity: line.quantity,
+            unitPriceCents: line.unitPriceCents,
+          });
+        }
+      });
+
+      // Email Admins for POD
+      try {
+        const { users } = await import("../db/schema.js");
+        const adminUsers = await db.select().from(users).where(eq(users.role, "admin"));
+        const adminEmails = adminUsers.map((u) => u.email).filter(Boolean);
+
+        if (adminEmails.length > 0) {
+          const resendKey = process.env.RESEND_API_KEY;
+          if (resendKey) {
+            // @ts-ignore
+            const { Resend } = await import("resend");
+            const resend = new Resend(resendKey);
+            await resend.emails.send({
+              from: "Emporium Corner Orders <onboarding@resend.dev>",
+              to: adminEmails,
+              subject: "New Pay-on-Delivery Order - Emporium Corner",
+              html: `<h2>New Order Placed (Pay on Delivery)</h2>
+                <p>A new order has been placed via Pay on Delivery.</p>
+                <p><strong>Amount:</strong> NGN ${(totalCents / 100).toFixed(2)}</p>
+                <p>Please check the admin dashboard to fulfill this order and collect payment on delivery.</p>
+              `,
+            });
+          }
+        }
+      } catch (e) {
+        console.error("Error emailing admins for POD:", e);
+      }
+
+      res.json({ checkoutUrl: successUrl.replace("{CHECKOUT_ID}", session.id) });
+      return;
+    }
 
     const checkout = await paystackInitializeCheckout(env, {
       email: localUser.email || "customer@example.com",

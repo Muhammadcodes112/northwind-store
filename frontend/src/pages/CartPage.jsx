@@ -133,20 +133,32 @@ function CartPage() {
             </div>
 
             <Show when="signed-in">
-              <button
-                type="button"
-                onClick={checkout}
-                disabled={checkoutLoading}
-                aria-busy={checkoutLoading}
-                className="btn btn-primary mt-6 w-full gap-2"
-              >
-                {checkoutLoading ? (
-                  <span className="loading loading-spinner loading-sm" aria-hidden />
-                ) : (
+              <div className="mt-6 space-y-2">
+                <button
+                  type="button"
+                  onClick={() => checkout("paystack")}
+                  disabled={checkoutLoading}
+                  aria-busy={checkoutLoading}
+                  className="btn btn-primary w-full gap-2"
+                >
+                  {checkoutLoading ? (
+                    <span className="loading loading-spinner loading-sm" aria-hidden />
+                  ) : (
+                    <ShoppingCartIcon className="size-4" aria-hidden />
+                  )}
+                  {checkoutLoading ? "Opening checkout…" : "Pay with Card"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => checkout("pod")}
+                  disabled={checkoutLoading}
+                  className="btn btn-outline btn-primary w-full gap-2"
+                >
                   <ShoppingCartIcon className="size-4" aria-hidden />
-                )}
-                {checkoutLoading ? "Opening checkout…" : "Checkout securely"}
-              </button>
+                  Pay on Delivery
+                </button>
+              </div>
             </Show>
 
             <Show when="signed-out">

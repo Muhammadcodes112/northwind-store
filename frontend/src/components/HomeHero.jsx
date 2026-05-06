@@ -45,15 +45,15 @@ export function HomeHero({ products, loading }) {
     <section className="relative w-full max-w-7xl mx-auto overflow-hidden rounded-none md:rounded-xl shadow-sm bg-[#f2f4e6] group">
       <button 
         onClick={() => scroll('left')} 
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-16 w-8 md:h-24 md:w-12 bg-black/20 backdrop-blur-sm hover:bg-black/40 flex items-center justify-center transition-colors"
+        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 size-8 md:size-14 rounded-full bg-black/20 backdrop-blur-sm hover:bg-black/40 flex items-center justify-center transition-colors"
       >
-        <ChevronLeftIcon className="text-white size-6 md:size-8" />
+        <ChevronLeftIcon className="text-white size-5 md:size-8 -ml-0.5" />
       </button>
       <button 
         onClick={() => scroll('right')} 
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-16 w-8 md:h-24 md:w-12 bg-black/20 backdrop-blur-sm hover:bg-black/40 flex items-center justify-center transition-colors"
+        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 size-8 md:size-14 rounded-full bg-black/20 backdrop-blur-sm hover:bg-black/40 flex items-center justify-center transition-colors"
       >
-        <ChevronRightIcon className="text-white size-6 md:size-8" />
+        <ChevronRightIcon className="text-white size-5 md:size-8 -mr-0.5" />
       </button>
 
       <div 

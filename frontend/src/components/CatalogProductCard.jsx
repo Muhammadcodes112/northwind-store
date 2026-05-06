@@ -58,7 +58,7 @@ export function CatalogProductCard({ product }) {
             className="btn btn-primary btn-xs sm:btn-sm gap-1 shadow"
           >
             <PlusIcon className="size-3 sm:size-4" aria-hidden />
-            <span className="hidden sm:inline">Add</span>
+            <span>Add</span>
           </button>
         </div>
       </div>

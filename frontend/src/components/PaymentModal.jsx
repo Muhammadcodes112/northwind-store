@@ -3,7 +3,14 @@ import toast from "react-hot-toast";
 import { MessageCircleIcon, CreditCardIcon } from "lucide-react";
 
 // eslint-disable-next-line react/prop-types
-export function PaymentModal({ order, whatsappNumber, onCancelOrder, isCancelling }) {
+export function PaymentModal({
+  order,
+  whatsappNumber,
+  onCancelOrder,
+  isCancelling,
+  onPaymentComplete,
+  isCompleting,
+}) {
   // Step 0: closed
   // Step 1: Warning (Only make payments when delivery has been made)
   // Step 2: Payment Details with timer
@@ -35,12 +42,17 @@ export function PaymentModal({ order, whatsappNumber, onCancelOrder, isCancellin
     return `${m}:${s < 10 ? "0" : ""}${s}`;
   };
 
-  const handlePaymentMade = () => {
-    setStep(0);
-    toast.success("Thank you for patronizing us!", {
-      duration: 5000,
-      icon: "🎉",
-    });
+  const handlePaymentMade = async () => {
+    try {
+      await onPaymentComplete();
+      setStep(0);
+      toast.success("Payment confirmed. Order marked as completed.", {
+        duration: 5000,
+        icon: "🎉",
+      });
+    } catch (error) {
+      toast.error(error?.message || "Could not complete order. Please try again.");
+    }
   };
 
   return (
@@ -138,8 +150,9 @@ export function PaymentModal({ order, whatsappNumber, onCancelOrder, isCancellin
                   <button 
                     className="btn btn-primary w-full border-none shadow-md"
                     onClick={handlePaymentMade}
+                    disabled={isCompleting}
                   >
-                    Payment Made
+                    {isCompleting ? "Completing..." : "Payment Made"}
                   </button>
                 </div>
               </div>

@@ -164,3 +164,52 @@ export async function cancelOrder(req: Request, res: Response, next: NextFunctio
     next(e);
   }
 }
+
+export async function completeOrder(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { userId, isAuthenticated } = getAuth(req);
+    if (!isAuthenticated || !userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    const localUser = await getLocalUser(userId);
+    if (!localUser) {
+      res.status(503).json({ error: "Account not synced yet" });
+      return;
+    }
+
+    const [order] = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.id, req.params.id as string))
+      .limit(1);
+
+    if (!order) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+
+    // Customers can only complete their own order.
+    if (order.userId !== localUser.id) {
+      res.status(403).json({ error: "Forbidden" });
+      return;
+    }
+
+    // Avoid invalid state changes from cancelled/failed.
+    if (!["pending", "paid"].includes(order.status)) {
+      res.status(400).json({ error: "Only pending or paid orders can be completed." });
+      return;
+    }
+
+    const [updatedOrder] = await db
+      .update(orders)
+      .set({ status: "completed", updatedAt: new Date() })
+      .where(eq(orders.id, order.id))
+      .returning();
+
+    res.json({ order: updatedOrder });
+  } catch (e) {
+    next(e);
+  }
+}

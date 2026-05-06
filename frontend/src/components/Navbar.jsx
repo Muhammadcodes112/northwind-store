@@ -47,6 +47,7 @@ const SearchForm = ({ className }) => (
 
 const Navbar = () => {
   const { getToken, isSignedIn } = useAuth();
+  const profileHoverAnimation = "transition-all duration-300 hover:scale-110 hover:shadow-md";
 
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem("theme") || "light";
@@ -80,7 +81,7 @@ const Navbar = () => {
               to="/"
               className="btn btn-ghost gap-2 px-1 lg:px-2 font-mono text-lg lg:text-xl font-semibold tracking-wide hover:bg-transparent"
             >
-              <img src="/logo.jpg" alt="Logo" className="h-8 w-8 lg:h-10 lg:w-10 object-cover rounded-full ring-2 ring-base-300 hover:ring-primary hover:scale-110 transition-all duration-300 shadow-sm" onError={(e) => { e.target.onerror = null; e.target.src = "/logo.png"; }} />
+              <img src="/logo.jpg" alt="Logo" className={`h-8 w-8 lg:h-10 lg:w-10 object-cover rounded-full ring-2 ring-base-300 hover:ring-primary shadow-sm ${profileHoverAnimation}`} onError={(e) => { e.target.onerror = null; e.target.src = "/logo.png"; }} />
             </Link>
 
             <div className="flex items-center gap-1 lg:hidden">
@@ -103,7 +104,7 @@ const Navbar = () => {
                 </SignInButton>
               </Show>
               <Show when={"signed-in"}>
-                <UserButton appearance={{ elements: { avatarBox: "h-8 w-8 ring-2 ring-base-300" } }}>
+                <UserButton appearance={{ elements: { avatarBox: `h-8 w-8 ring-2 ring-base-300 ${profileHoverAnimation}` } }}>
                   <UserButton.MenuItems>
                     <UserButton.Action 
                       label={theme === "light" ? "Dark Mode" : "Light Mode"} 
@@ -171,7 +172,7 @@ const Navbar = () => {
 
             <Show when={"signed-in"}>
               <div className="flex items-center gap-2 border-l border-base-300 pl-3">
-                <UserButton appearance={{ elements: { avatarBox: "h-10 w-10 ring-2 ring-base-300" } }}>
+                <UserButton appearance={{ elements: { avatarBox: `h-10 w-10 ring-2 ring-base-300 ${profileHoverAnimation}` } }}>
                   <UserButton.MenuItems>
                     <UserButton.Action 
                       label={theme === "light" ? "Dark Mode" : "Light Mode"} 

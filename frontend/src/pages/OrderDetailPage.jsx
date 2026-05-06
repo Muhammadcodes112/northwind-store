@@ -13,7 +13,18 @@ import { formatOrderWhen, formatPrice } from "../utils/format";
 import { PaymentModal } from "../components/PaymentModal";
 
 function OrderDetailPage() {
-  const { order, items, paid, isLoading, error, whatsappNumber, cancelOrder, isCancelling } = useOrderDetailPage();
+  const {
+    order,
+    items,
+    paid,
+    isLoading,
+    error,
+    whatsappNumber,
+    cancelOrder,
+    isCancelling,
+    completeOrder,
+    isCompleting,
+  } = useOrderDetailPage();
 
   if (isLoading) {
     return <OrderDetailSkeleton />;
@@ -71,7 +82,9 @@ function OrderDetailPage() {
                   order={order} 
                   whatsappNumber={whatsappNumber} 
                   onCancelOrder={cancelOrder} 
-                  isCancelling={isCancelling} 
+                  isCancelling={isCancelling}
+                  onPaymentComplete={completeOrder}
+                  isCompleting={isCompleting}
                 />
               )}
 

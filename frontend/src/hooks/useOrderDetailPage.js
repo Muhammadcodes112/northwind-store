@@ -32,6 +32,20 @@ export function useOrderDetailPage() {
     },
   });
 
+  const completeOrderMutation = useMutation({
+    mutationFn: async () => {
+      return apiFetch(`/api/orders/${id}/complete`, {
+        method: "POST",
+        getToken,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["order", id] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
+    },
+  });
+
   const order = data?.order ?? null;
   const items = data?.items ?? [];
   const paid = order?.status === "paid";
@@ -48,5 +62,7 @@ export function useOrderDetailPage() {
     isLoadingWhatsapp,
     cancelOrder: () => cancelOrderMutation.mutate(),
     isCancelling: cancelOrderMutation.isPending,
+    completeOrder: () => completeOrderMutation.mutateAsync(),
+    isCompleting: completeOrderMutation.isPending,
   };
 }

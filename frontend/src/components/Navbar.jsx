@@ -81,7 +81,9 @@ const Navbar = () => {
               className="btn btn-ghost gap-2 px-1 lg:px-2 font-mono text-sm sm:text-base lg:text-xl font-semibold tracking-wide hover:bg-transparent"
             >
               <img src="/logo.jpg" alt="Logo" className={`h-7 w-7 lg:h-10 lg:w-10 object-cover rounded-full ring-2 ring-base-300 shadow-sm ${profileHoverAnimation}`} onError={(e) => { e.target.onerror = null; e.target.src = "/logo.png"; }} />
-              <span>The Emporium Corner</span>
+              <span>
+                <span className={theme === "dark" ? "text-neutral-900" : "text-base-content"}>T</span>he Emporium Corner
+              </span>
             </Link>
 
             <div className="flex items-center gap-1 lg:hidden">

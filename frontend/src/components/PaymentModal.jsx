@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { MessageCircleIcon, CreditCardIcon } from "lucide-react";
+import { formatPrice } from "../utils/format";
 
 // eslint-disable-next-line react/prop-types
 export function PaymentModal({
   order,
+  items,
   whatsappNumber,
   onCancelOrder,
   isCancelling,
@@ -41,6 +43,38 @@ export function PaymentModal({
     const s = seconds % 60;
     return `${m}:${s < 10 ? "0" : ""}${s}`;
   };
+
+  const accountNumber = "8133180063";
+
+  const copyAccountNumber = async () => {
+    try {
+      await navigator.clipboard.writeText(accountNumber);
+      toast.success("Account number copied.");
+    } catch {
+      toast.error("Could not copy account number.");
+    }
+  };
+
+  const receiptMessage = (() => {
+    const itemLines = (items ?? [])
+      .map((item) => {
+        const name = item?.product?.name ?? "Item";
+        const quantity = item?.quantity ?? 0;
+        const lineTotal = (item?.unitPriceCents ?? 0) * quantity;
+        return `- ${name} | Qty: ${quantity} | Price: ${formatPrice(lineTotal, "ngn")}`;
+      })
+      .join("\n");
+
+    const message = [
+      "Hello Admin, payment has been made.",
+      `Order Code: #${order.id.slice(0, 8)}`,
+      "Order Items:",
+      itemLines || "- No items listed",
+      "Here is my receipt.",
+    ].join("\n");
+
+    return encodeURIComponent(message);
+  })();
 
   const handlePaymentMade = async () => {
     try {
@@ -118,7 +152,14 @@ export function PaymentModal({
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium text-base-content/60">Account Number</span>
-                      <span className="font-mono font-bold text-lg text-primary">8133180063</span>
+                      <button
+                        type="button"
+                        onClick={copyAccountNumber}
+                        className="btn btn-xs btn-outline btn-primary font-mono font-bold"
+                        title="Copy account number"
+                      >
+                        {accountNumber}
+                      </button>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium text-base-content/60">Account Name</span>
@@ -132,14 +173,14 @@ export function PaymentModal({
                 </div>
 
                 <div className="modal-action flex-col sm:flex-row gap-2 mt-6">
-                  <button className="btn btn-ghost w-full sm:w-auto" onClick={() => setStep(0)}>
+                  <button className="btn btn-error btn-outline w-full sm:w-auto" onClick={() => setStep(0)}>
                     Cancel Payment
                   </button>
                   <a
-                    href={`https://wa.me/${whatsappNumber}?text=Hello%20Admin,%20I%20have%20made%20payment%20for%20order%20%23${order.id.slice(0, 8)}.%20Attached%20is%20my%20receipt!`}
+                    href={`https://wa.me/${whatsappNumber}?text=${receiptMessage}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="btn btn-success text-white flex-1"
+                    className="btn btn-success text-white flex-1 min-h-16 sm:min-h-12"
                   >
                     <MessageCircleIcon className="size-4" />
                     Send Receipt to Admin

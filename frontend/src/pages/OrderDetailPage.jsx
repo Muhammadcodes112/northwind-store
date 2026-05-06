@@ -80,6 +80,7 @@ function OrderDetailPage() {
               {order.status === "pending" && (
                 <PaymentModal 
                   order={order} 
+                  items={items}
                   whatsappNumber={whatsappNumber} 
                   onCancelOrder={cancelOrder} 
                   isCancelling={isCancelling}

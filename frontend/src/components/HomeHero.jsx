@@ -84,7 +84,7 @@ export function HomeHero({ products, loading }) {
             {/* Right Content (Polaroid-style Image) */}
             <div className="w-1/2 h-full flex items-center justify-center relative overflow-visible pr-4 md:pr-12">
                {product.imageUrl ? (
-                 <div className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-64 md:h-64 bg-white p-1.5 sm:p-2 shadow-2xl transform rotate-[10deg] transition-transform duration-500 group-hover:rotate-[5deg]">
+                 <div className="relative w-[135px] h-[135px] sm:w-[170px] sm:h-[170px] md:w-64 md:h-64 bg-white p-1.5 sm:p-2 shadow-2xl transform rotate-[10deg] transition-transform duration-500 group-hover:rotate-[5deg]">
                    <img
                      src={imageKitOptimizedUrl(product.imageUrl, IK_PRESETS.catalogCard)}
                      alt={product.name}

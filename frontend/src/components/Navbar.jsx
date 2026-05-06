@@ -98,6 +98,12 @@ const Navbar = () => {
                 <button onClick={toggleTheme} className="btn btn-ghost btn-circle btn-sm">
                   {theme === "light" ? <MoonIcon className="size-4" /> : <SunIcon className="size-4" />}
                 </button>
+                <SignInButton mode="modal">
+                  <button type="button" className="btn btn-primary btn-xs sm:btn-sm gap-1 px-2 shadow-md">
+                    <LogInIcon className="size-3 sm:size-4 drop-shadow-sm" aria-hidden />
+                    Sign in
+                  </button>
+                </SignInButton>
               </Show>
               <Show when={"signed-in"}>
                 <UserButton appearance={{ elements: { avatarBox: "h-8 w-8 ring-2 ring-base-300" } }}>

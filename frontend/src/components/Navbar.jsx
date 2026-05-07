@@ -102,46 +102,6 @@ const MobileSearchModal = ({ isOpen, onClose }) => {
   );
 };
 
-const NotificationDropdown = ({ getToken }) => {
-  const { data: ordersData } = useQuery({
-    queryKey: ["orders"],
-    queryFn: () => apiFetch("/api/orders", { getToken }),
-    refetchInterval: 10000,
-  });
-
-  const completedOrders = ordersData?.orders?.filter(o => o.status === "completed") || [];
-
-  return (
-    <div className="dropdown dropdown-end">
-      <div tabIndex={0} role="button" className="btn btn-ghost btn-circle btn-sm">
-        <div className="indicator">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-          {completedOrders.length > 0 && (
-            <span className="badge badge-xs badge-primary indicator-item"></span>
-          )}
-        </div>
-      </div>
-      <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64 mt-3 max-h-60 overflow-y-auto flex-col gap-1">
-        <li className="menu-title px-2 py-1 text-xs">Notifications</li>
-        {completedOrders.length === 0 ? (
-          <li className="px-2 py-2 text-xs text-base-content/50 text-center">No recent notifications</li>
-        ) : (
-          completedOrders.map(order => (
-            <li key={order.id} className="bg-base-200/50 rounded-lg">
-              <Link to={`/orders`} className="flex flex-col gap-0.5 p-2 text-xs">
-                <span className="font-semibold text-success">Order Completed</span>
-                <span className="text-base-content/70">#{order.id.slice(0, 8)}</span>
-              </Link>
-            </li>
-          ))
-        )}
-      </ul>
-    </div>
-  );
-};
-
 const Navbar = () => {
   const { getToken, isSignedIn } = useAuth();
   const navigate = useNavigate();
@@ -236,7 +196,13 @@ const Navbar = () => {
                 </SignInButton>
               </Show>
               <Show when={"signed-in"}>
-                <NotificationDropdown getToken={getToken} />
+                <Link to="/orders" className="btn btn-ghost btn-circle btn-sm">
+                  <div className="indicator">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                  </div>
+                </Link>
               </Show>
             </div>
           </div>

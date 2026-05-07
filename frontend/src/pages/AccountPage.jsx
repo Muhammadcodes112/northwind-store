@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../lib/api";
 import toast from "react-hot-toast";
-import { PhoneCallIcon } from "lucide-react";
+import { MailIcon, PhoneCallIcon } from "lucide-react";
 
 function AccountPage() {
   const { getToken } = useAuth();
@@ -14,8 +14,16 @@ function AccountPage() {
   });
 
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
 
-  const saveMutation = useMutation({
+  useEffect(() => {
+    if (data?.user) {
+      setPhone(data.user.whatsappNumber ?? "");
+      setEmail(data.user.email ?? "");
+    }
+  }, [data]);
+
+  const savePhoneMutation = useMutation({
     mutationFn: () =>
       apiFetch("/api/me", {
         method: "PATCH",
@@ -27,6 +35,20 @@ function AccountPage() {
       queryClient.invalidateQueries({ queryKey: ["me"] });
     },
     onError: (err) => toast.error(err.message || "Could not update phone number."),
+  });
+
+  const saveEmailMutation = useMutation({
+    mutationFn: () =>
+      apiFetch("/api/me", {
+        method: "PATCH",
+        body: { email: email.trim() },
+        getToken,
+      }),
+    onSuccess: () => {
+      toast.success("Email updated.");
+      queryClient.invalidateQueries({ queryKey: ["me"] });
+    },
+    onError: (err) => toast.error(err.message || "Could not update email."),
   });
 
   const currentPhone = data?.user?.whatsappNumber ?? "";
@@ -59,10 +81,36 @@ function AccountPage() {
 
       <button
         className="btn btn-primary mt-5"
-        onClick={() => saveMutation.mutate()}
-        disabled={saveMutation.isPending || !phone.trim()}
+        onClick={() => savePhoneMutation.mutate()}
+        disabled={savePhoneMutation.isPending || !phone.trim()}
       >
-        {saveMutation.isPending ? "Saving..." : "Save number"}
+        {savePhoneMutation.isPending ? "Saving..." : "Save number"}
+      </button>
+
+      <div className="mt-8 space-y-2">
+        <label className="label p-0">
+          <span className="label-text flex items-center gap-2">
+            <MailIcon className="size-4 text-primary" /> Account email (single email only)
+          </span>
+        </label>
+        <input
+          type="email"
+          className="input input-bordered w-full"
+          placeholder="your@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <p className="text-xs text-base-content/60">
+          You can update this email, but only one email is kept on the account.
+        </p>
+      </div>
+
+      <button
+        className="btn btn-secondary mt-4"
+        onClick={() => saveEmailMutation.mutate()}
+        disabled={saveEmailMutation.isPending || !email.trim()}
+      >
+        {saveEmailMutation.isPending ? "Saving..." : "Save email"}
       </button>
     </div>
   );

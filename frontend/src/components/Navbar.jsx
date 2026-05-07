@@ -14,6 +14,7 @@ import {
   SunIcon,
 } from "lucide-react";
 import { useCart } from "../store/cart";
+import toast from "react-hot-toast";
 
 const SearchForm = ({ className }) => (
   <form 
@@ -71,6 +72,11 @@ const Navbar = () => {
   const role = meData?.user?.role;
 
   const cartCount = useCart((s) => s.items.reduce((n, line) => n + line.quantity, 0));
+  const adminWelcome = () =>
+    toast.success("Welcome back, Admin. You are in control.", {
+      duration: 3000,
+      icon: "👋",
+    });
 
   return (
     <header className="sticky top-0 z-50 border-b border-base-300 bg-base-100/95 shadow-sm backdrop-blur-md">
@@ -89,7 +95,11 @@ const Navbar = () => {
 
             <div className="flex items-center gap-1 lg:hidden">
               {role === "admin" ? (
-                <Link to="/admin" className="btn btn-ghost px-2 gap-1 font-medium text-secondary">
+                <Link
+                  to="/admin"
+                  onClick={adminWelcome}
+                  className="btn btn-ghost px-2 gap-1 font-medium text-secondary"
+                >
                   <SettingsIcon className="size-5" aria-hidden />
                   <span className="text-sm">Admin</span>
                 </Link>
@@ -107,7 +117,11 @@ const Navbar = () => {
                 </SignInButton>
               </Show>
               <Show when={"signed-in"}>
-                <UserButton appearance={{ elements: { avatarBox: `h-8 w-8 ring-2 ring-base-300 ${profileHoverAnimation}` } }}>
+                <UserButton
+                  userProfileMode="navigation"
+                  userProfileUrl="/account"
+                  appearance={{ elements: { avatarBox: `h-8 w-8 ring-2 ring-base-300 ${profileHoverAnimation}` } }}
+                >
                   <UserButton.MenuItems>
                     <UserButton.Action label="Manage account" onClick={() => navigate("/account")} />
                     <UserButton.Action 
@@ -141,7 +155,11 @@ const Navbar = () => {
               </Link>
 
               {role === "admin" ? (
-                <Link to="/admin" className="btn btn-ghost px-2 gap-2 font-medium text-secondary">
+                <Link
+                  to="/admin"
+                  onClick={adminWelcome}
+                  className="btn btn-ghost px-2 gap-2 font-medium text-secondary"
+                >
                   <SettingsIcon className="size-6" aria-hidden />
                   <span className="text-base">Admin</span>
                 </Link>
@@ -176,7 +194,11 @@ const Navbar = () => {
 
             <Show when={"signed-in"}>
               <div className="flex items-center gap-2 border-l border-base-300 pl-3">
-                <UserButton appearance={{ elements: { avatarBox: `h-10 w-10 ring-2 ring-base-300 ${profileHoverAnimation}` } }}>
+                <UserButton
+                  userProfileMode="navigation"
+                  userProfileUrl="/account"
+                  appearance={{ elements: { avatarBox: `h-10 w-10 ring-2 ring-base-300 ${profileHoverAnimation}` } }}
+                >
                   <UserButton.MenuItems>
                     <UserButton.Action label="Manage account" onClick={() => navigate("/account")} />
                     <UserButton.Action 

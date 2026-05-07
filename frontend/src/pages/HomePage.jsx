@@ -22,7 +22,7 @@ function HomePage() {
       <section id="catolag" className="scroll-mt-24">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-base-content md:text-2xl uppercase font-mono">
+            <h2 className="text-xl sm:text-2xl font-bold text-base-content md:text-2xl uppercase font-mono">
               All Categories
             </h2>
           </div>

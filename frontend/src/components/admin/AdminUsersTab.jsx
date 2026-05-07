@@ -23,7 +23,7 @@ export function AdminUsersTab({ getToken }) {
     mutationFn: (emailArg) =>
       apiFetch("/api/admin/admins", {
         method: "POST",
-        body: JSON.stringify({ email: emailArg }),
+        body: { email: emailArg },
         getToken,
       }),
     onSuccess: () => {

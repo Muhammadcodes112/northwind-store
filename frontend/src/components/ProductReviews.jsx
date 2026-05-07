@@ -20,7 +20,7 @@ export function ProductReviews({ productSlug }) {
     mutationFn: (body) =>
       apiFetch(`/api/products/${productSlug}/reviews`, {
         method: "POST",
-        body: JSON.stringify(body),
+        body,
         getToken,
       }),
     onSuccess: () => {

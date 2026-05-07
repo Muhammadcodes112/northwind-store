@@ -51,20 +51,22 @@ export async function sendPendingOrderAdminReminders() {
       )
       .join("");
 
-    await resend.emails.send({
-      from: "Emporium Corner Orders <onboarding@resend.dev>",
-      to: adminEmails,
-      subject: `Order Pending Confirmation: #${order.id.slice(0, 8)}`,
-      html: `
-        <h2>Order Alert</h2>
-        <p>The customer has not cancelled this order in 20 minutes.</p>
-        <p><strong>Order Code:</strong> #${order.id.slice(0, 8)}</p>
-        <p><strong>Delivery Location:</strong> ${order.deliveryLocation ?? "Not provided"}</p>
-        <p><strong>Total:</strong> ${currencyFromCents(order.totalCents)}</p>
-        <p><strong>Items:</strong></p>
-        <ul>${lines || "<li>No items</li>"}</ul>
-      `,
-    });
+    for (const adminEmail of adminEmails) {
+      await resend.emails.send({
+        from: "Emporium Corner Orders <onboarding@resend.dev>",
+        to: adminEmail,
+        subject: `Order Pending Confirmation: #${order.id.slice(0, 8)}`,
+        html: `
+          <h2>Order Alert</h2>
+          <p>The customer has not cancelled this order in 20 minutes.</p>
+          <p><strong>Order Code:</strong> #${order.id.slice(0, 8)}</p>
+          <p><strong>Delivery Location:</strong> ${order.deliveryLocation ?? "Not provided"}</p>
+          <p><strong>Total:</strong> ${currencyFromCents(order.totalCents)}</p>
+          <p><strong>Items:</strong></p>
+          <ul>${lines || "<li>No items</li>"}</ul>
+        `,
+      }).catch(console.error);
+    }
 
     await db
       .update(orders)
@@ -108,28 +110,30 @@ export async function notifyOrderCreated(orderId: string) {
   const { Resend } = await import("resend");
   const resend = new Resend(resendKey);
 
-  await resend.emails.send({
-    from: "Emporium Corner Orders <onboarding@resend.dev>",
-    to: adminEmails,
-    subject: `New Order Created: #${order.id.slice(0, 8)}`,
-    html: `
-      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #333;">New Order Received!</h2>
-        <p>A new order has been made by a customer.</p>
-        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px;">
-          <p><strong>Order Code:</strong> #${order.id.slice(0, 8)}</p>
-          <p><strong>Customer Name:</strong> ${user.displayName || "N/A"}</p>
-          <p><strong>Customer Email:</strong> ${user.email || "N/A"}</p>
-          <p><strong>Customer Phone:</strong> ${user.whatsappNumber || "Not provided"}</p>
-          <p><strong>Delivery Location:</strong> ${order.deliveryLocation ?? "Not provided"}</p>
-          <p><strong>Total:</strong> ${currencyFromCents(order.totalCents)}</p>
-          <p><strong>Status:</strong> ${order.status}</p>
+  for (const adminEmail of adminEmails) {
+    await resend.emails.send({
+      from: "Emporium Corner Orders <onboarding@resend.dev>",
+      to: adminEmail,
+      subject: `New Order Created: #${order.id.slice(0, 8)}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #333;">New Order Received!</h2>
+          <p>A new order has been made by a customer.</p>
+          <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px;">
+            <p><strong>Order Code:</strong> #${order.id.slice(0, 8)}</p>
+            <p><strong>Customer Name:</strong> ${user.displayName || "N/A"}</p>
+            <p><strong>Customer Email:</strong> ${user.email || "N/A"}</p>
+            <p><strong>Customer Phone:</strong> ${user.whatsappNumber || "Not provided"}</p>
+            <p><strong>Delivery Location:</strong> ${order.deliveryLocation ?? "Not provided"}</p>
+            <p><strong>Total:</strong> ${currencyFromCents(order.totalCents)}</p>
+            <p><strong>Status:</strong> ${order.status}</p>
+          </div>
+          <p><strong>Products:</strong></p>
+          <ul>${lines || "<li>No items</li>"}</ul>
         </div>
-        <p><strong>Products:</strong></p>
-        <ul>${lines || "<li>No items</li>"}</ul>
-      </div>
-    `,
-  });
+      `,
+    }).catch(console.error);
+  }
 }
 
 export async function notifyOrderCompleted(orderId: string) {
@@ -208,25 +212,27 @@ export async function notifyOrderCompleted(orderId: string) {
       )
       .join("");
 
-    await resend.emails.send({
-      from: "Emporium Corner Orders <onboarding@resend.dev>",
-      to: adminEmails,
-      subject: `Order Completed: #${order.id.slice(0, 8)}`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #4CAF50;">Order Completed</h2>
-          <p>An order has been completed by the customer or admin.</p>
-          <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px;">
-            <p><strong>Order Code:</strong> #${order.id.slice(0, 8)}</p>
-            <p><strong>Customer Name:</strong> ${user.displayName || "N/A"}</p>
-            <p><strong>Customer Phone:</strong> ${user.whatsappNumber || "Not provided"}</p>
-            <p><strong>Total:</strong> ${currencyFromCents(order.totalCents)}</p>
+    for (const adminEmail of adminEmails) {
+      await resend.emails.send({
+        from: "Emporium Corner Orders <onboarding@resend.dev>",
+        to: adminEmail,
+        subject: `Order Completed: #${order.id.slice(0, 8)}`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #4CAF50;">Order Completed</h2>
+            <p>An order has been completed by the customer or admin.</p>
+            <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px;">
+              <p><strong>Order Code:</strong> #${order.id.slice(0, 8)}</p>
+              <p><strong>Customer Name:</strong> ${user.displayName || "N/A"}</p>
+              <p><strong>Customer Phone:</strong> ${user.whatsappNumber || "Not provided"}</p>
+              <p><strong>Total:</strong> ${currencyFromCents(order.totalCents)}</p>
+            </div>
+            <p><strong>Products:</strong></p>
+            <ul>${adminLines || "<li>No items</li>"}</ul>
           </div>
-          <p><strong>Products:</strong></p>
-          <ul>${adminLines || "<li>No items</li>"}</ul>
-        </div>
-      `,
-    });
+        `,
+      }).catch(console.error);
+    }
   }
 }
 

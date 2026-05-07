@@ -45,6 +45,63 @@ const SearchForm = ({ className }) => (
   </form>
 );
 
+const MobileSearchModal = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-[100] bg-base-100 flex flex-col animate-in fade-in zoom-in-95 duration-200">
+      <div className="p-4 border-b border-base-200 flex items-center gap-2">
+        <button onClick={onClose} className="btn btn-ghost btn-sm btn-circle shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-base-content">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+        </button>
+        <form 
+          className="flex-1 flex items-center bg-base-200 rounded-full pr-1 overflow-hidden"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const q = new FormData(e.target).get("q").trim();
+            if (q) window.location.href = `/?q=${encodeURIComponent(q)}#catalog`;
+            else window.location.href = `/#catalog`;
+            onClose();
+          }}
+        >
+          <input 
+            type="text" 
+            name="q" 
+            placeholder="Search..." 
+            className="input input-sm bg-transparent border-0 focus:outline-none w-full pl-4"
+            autoFocus
+          />
+          <button type="submit" className="btn btn-sm btn-circle btn-primary ml-1 shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
+        </form>
+      </div>
+      <div className="flex-1 p-4 overflow-y-auto">
+        <div className="flex flex-col gap-5">
+          {["perfumes", "cosmetics", "interior decoration", "phones", "boutiques", "cars"].map(s => (
+            <div 
+              key={s} 
+              className="flex items-center gap-4 text-sm text-base-content/90 font-medium cursor-pointer py-1"
+              onClick={() => {
+                window.location.href = `/?q=${encodeURIComponent(s)}#catalog`;
+                onClose();
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <span className="capitalize">{s}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const NotificationDropdown = ({ getToken }) => {
   const { data: ordersData } = useQuery({
     queryKey: ["orders"],
@@ -89,6 +146,8 @@ const Navbar = () => {
   const { getToken, isSignedIn } = useAuth();
   const navigate = useNavigate();
   const profileHoverAnimation = "transition-all duration-300 hover:scale-110 hover:shadow-md";
+
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem("theme") || "light";
@@ -157,10 +216,7 @@ const Navbar = () => {
               ) : null}
 
               <button 
-                onClick={() => {
-                  const q = prompt("Search catalog...");
-                  if (q) window.location.href = `/?q=${encodeURIComponent(q)}#catalog`;
-                }}
+                onClick={() => setIsSearchOpen(true)}
                 className="btn btn-ghost btn-circle btn-sm"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-base-content" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -279,6 +335,7 @@ const Navbar = () => {
           </nav>
         </div>
       </div>
+      <MobileSearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </header>
   );
 };

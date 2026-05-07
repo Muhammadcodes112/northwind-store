@@ -58,7 +58,7 @@ export function AdminOrdersTab({ getToken }) {
   };
 
   return (
-    <div className="space-y-6 text-sm sm:text-base">
+    <div className="space-y-6 text-[13px] sm:text-base">
       {statusFilter === "completed" && (
         <div className="stats shadow bg-base-100 border border-base-300 w-full md:w-auto">
           <div className="stat">
@@ -98,16 +98,17 @@ export function AdminOrdersTab({ getToken }) {
               <th>Total</th>
               <th>Status</th>
               <th className="text-right">Actions</th>
+              <th className="text-right">Details</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan="7" className="text-center py-4">Loading...</td>
+                <td colSpan="8" className="text-center py-4">Loading...</td>
               </tr>
             ) : displayedOrders.length === 0 ? (
               <tr>
-                <td colSpan="7" className="text-center py-8 text-base-content/50">
+                <td colSpan="8" className="text-center py-8 text-base-content/50">
                   No {statusFilter} orders found
                 </td>
               </tr>
@@ -138,32 +139,31 @@ export function AdminOrdersTab({ getToken }) {
                     </span>
                   </td>
                   <td className="text-right">
-                    <div className="flex flex-col items-end gap-2">
-                      {order.status !== "completed" ? (
-                        <button
-                          className="btn btn-sm btn-success gap-1"
-                          onClick={() => openConfirm(order, "completed")}
-                          disabled={updateStatusMutation.isPending}
-                        >
-                          <CheckCircleIcon className="size-4" /> Complete
-                        </button>
-                      ) : (
-                        <button
-                          className="btn btn-sm btn-ghost gap-1"
-                          onClick={() => openConfirm(order, "pending")}
-                          disabled={updateStatusMutation.isPending}
-                        >
-                          <ClockIcon className="size-4" /> Revert
-                        </button>
-                      )}
-
-                      <Link
-                        to={`/admin/orders/${order.id}`}
-                        className="btn btn-sm btn-ghost"
+                    {order.status !== "completed" ? (
+                      <button
+                        className="btn btn-sm btn-success gap-1"
+                        onClick={() => openConfirm(order, "completed")}
+                        disabled={updateStatusMutation.isPending}
                       >
-                        Read more
-                      </Link>
-                    </div>
+                        <CheckCircleIcon className="size-4" /> Complete
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-sm btn-ghost gap-1"
+                        onClick={() => openConfirm(order, "pending")}
+                        disabled={updateStatusMutation.isPending}
+                      >
+                        <ClockIcon className="size-4" /> Revert
+                      </button>
+                    )}
+                  </td>
+                  <td className="text-right">
+                    <Link
+                      to={`/admin/orders/${order.id}`}
+                      className="btn btn-sm btn-outline btn-primary rounded-full"
+                    >
+                      Read more
+                    </Link>
                   </td>
                 </tr>
               ))

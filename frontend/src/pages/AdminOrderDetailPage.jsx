@@ -82,12 +82,12 @@ function AdminOrderDetailPage() {
   const whatsappUrl = whatsappDigits ? `https://wa.me/${whatsappDigits}` : null;
 
   return (
-    <div className="text-left space-y-6">
+    <div className="text-left text-[13px] sm:text-base space-y-6">
       <div className="flex items-center justify-between gap-4 border-b border-base-300 pb-4">
         <div>
           <div className="flex items-center gap-2">
             <PackageIcon className="size-6 text-primary" aria-hidden />
-            <h1 className="text-2xl font-bold">Order Details</h1>
+            <h1 className="text-xl sm:text-2xl font-bold">Order Details</h1>
           </div>
           <p className="mt-1 text-sm text-base-content/60">
             #{order.id.slice(0, 8)} · {new Date(order.createdAt).toLocaleString()}

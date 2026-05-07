@@ -19,7 +19,7 @@ export function PaymentModal({
   // Step 2: Payment Details with timer
   const [step, setStep] = useState(0);
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
-  const [phoneRequiredOpen, setPhoneRequiredOpen] = useState(false);
+  const [requirementsModalOpen, setRequirementsModalOpen] = useState(false);
   const [receiptReminder, setReceiptReminder] = useState(false);
 
   useEffect(() => {
@@ -37,8 +37,10 @@ export function PaymentModal({
   }, [step, timeLeft]);
 
   const openModal = () => {
-    if (!customerPhone?.trim()) {
-      setPhoneRequiredOpen(true);
+    const missingPhone = !customerPhone?.trim();
+    const missingLocation = !order?.deliveryLocation?.trim();
+    if (missingPhone || missingLocation) {
+      setRequirementsModalOpen(true);
       return;
     }
     setStep(1);
@@ -258,16 +260,16 @@ export function PaymentModal({
         </div>
       )}
 
-      {phoneRequiredOpen && (
+      {requirementsModalOpen && (
         <div className="modal modal-open bg-neutral/70 backdrop-blur-sm">
           <div className="modal-box max-w-md border border-warning/30">
-            <h3 className="text-xl font-bold text-warning">Phone Number Needed</h3>
+            <h3 className="text-xl font-bold text-warning">Complete Your Profile First</h3>
             <p className="mt-3 text-sm text-base-content/75">
-              Add your phone number first from profile menu → Manage account, then continue with
-              payment.
+              Payment can only continue after adding your phone number in Manage account and
+              setting your delivery location on the cart page.
             </p>
             <div className="modal-action">
-              <button className="btn btn-warning" onClick={() => setPhoneRequiredOpen(false)}>
+              <button className="btn btn-warning" onClick={() => setRequirementsModalOpen(false)}>
                 Okay
               </button>
             </div>

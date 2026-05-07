@@ -23,7 +23,7 @@ function AdminProductsPage() {
   }
 
   return (
-    <div className="text-left text-sm sm:text-base space-y-6">
+    <div className="text-left text-[13px] sm:text-base space-y-6">
       <div className="flex items-center gap-3 border-b border-base-300 pb-4">
         <LayoutDashboardIcon className="size-8 text-secondary" />
         <div>

@@ -61,7 +61,7 @@ export function AdminUsersTab({ getToken }) {
   const allUsers = usersData?.users || [];
 
   return (
-    <div className="space-y-8 text-sm sm:text-base">
+    <div className="space-y-8 text-[13px] sm:text-base">
       {/* Stats Cards */}
       <div className="stats shadow bg-base-100 border border-base-300 w-full md:w-auto">
         <div className="stat">
@@ -105,6 +105,7 @@ export function AdminUsersTab({ getToken }) {
               <thead>
                 <tr>
                   <th>Email</th>
+                  <th>Number</th>
                   <th>Role</th>
                   <th className="text-right">Actions</th>
                 </tr>
@@ -112,16 +113,17 @@ export function AdminUsersTab({ getToken }) {
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan="3" className="text-center py-4">Loading...</td>
+                    <td colSpan="4" className="text-center py-4">Loading...</td>
                   </tr>
                 ) : allUsers.length === 0 ? (
                   <tr>
-                    <td colSpan="3" className="text-center py-4 text-base-content/50">No users found</td>
+                    <td colSpan="4" className="text-center py-4 text-base-content/50">No users found</td>
                   </tr>
                 ) : (
                   allUsers.map((user) => (
                     <tr key={user.id}>
-                      <td>{user.email}</td>
+                      <td>{user.email || "No email"}</td>
+                      <td>{user.whatsappNumber || "No number"}</td>
                       <td>
                         <span className={`badge badge-sm capitalize ${user.role === 'admin' ? 'badge-primary' : 'badge-neutral'}`}>
                           {user.role}

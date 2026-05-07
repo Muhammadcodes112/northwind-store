@@ -47,6 +47,32 @@ function buildProductUpdateSet(body: z.infer<typeof productPatch>) {
   return data;
 }
 
+async function hydrateUserContact(user: typeof users.$inferSelect) {
+  if (user.email && user.email.trim().length > 0) return user;
+  try {
+    const clerkUser = await clerkClient.users.getUser(user.clerkUserId);
+    const primaryEmail = clerkUser.emailAddresses?.[0]?.emailAddress ?? "";
+    const fullName =
+      [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ").trim() || null;
+
+    if (primaryEmail || fullName) {
+      const [updated] = await db
+        .update(users)
+        .set({
+          ...(primaryEmail ? { email: primaryEmail } : {}),
+          ...(fullName ? { displayName: fullName } : {}),
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, user.id))
+        .returning();
+      return updated ?? user;
+    }
+  } catch {
+    // fallback to existing db values
+  }
+  return user;
+}
+
 export async function requireAdmin(req: Request, res: Response, next: NextFunction) {
   try {
     const { userId, isAuthenticated } = getAuth(req);
@@ -189,7 +215,8 @@ export async function getAdminStats(_req: Request, res: Response, next: NextFunc
 export async function listAdmins(_req: Request, res: Response, next: NextFunction) {
   try {
     const rows = await db.select().from(users).where(eq(users.role, "admin")).orderBy(desc(users.createdAt));
-    res.json({ admins: rows });
+    const hydrated = await Promise.all(rows.map(hydrateUserContact));
+    res.json({ admins: hydrated });
   } catch (e) {
     next(e);
   }
@@ -198,7 +225,8 @@ export async function listAdmins(_req: Request, res: Response, next: NextFunctio
 export async function listUsers(_req: Request, res: Response, next: NextFunction) {
   try {
     const rows = await db.select().from(users).orderBy(desc(users.createdAt));
-    res.json({ users: rows });
+    const hydrated = await Promise.all(rows.map(hydrateUserContact));
+    res.json({ users: hydrated });
   } catch (e) {
     next(e);
   }

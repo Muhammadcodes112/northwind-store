@@ -35,13 +35,14 @@ router.patch("/", async (req, res, next) => {
     const schema = z.object({
       whatsappNumber: z.string().trim().min(7).optional(),
       email: z.string().trim().email().optional(),
+      deliveryAddress: z.string().trim().min(3).optional(),
     });
     const parsed = schema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ error: "Invalid payload" });
       return;
     }
-    if (!parsed.data.whatsappNumber && !parsed.data.email) {
+    if (!parsed.data.whatsappNumber && !parsed.data.email && !parsed.data.deliveryAddress) {
       res.status(400).json({ error: "No fields to update" });
       return;
     }
@@ -57,6 +58,7 @@ router.patch("/", async (req, res, next) => {
     };
     if (parsed.data.whatsappNumber) updates.whatsappNumber = parsed.data.whatsappNumber;
     if (parsed.data.email) updates.email = parsed.data.email;
+    if (parsed.data.deliveryAddress) updates.deliveryAddress = parsed.data.deliveryAddress;
 
     const [updated] = await db
       .update(users)

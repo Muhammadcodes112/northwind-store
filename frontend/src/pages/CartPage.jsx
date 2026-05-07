@@ -14,9 +14,13 @@ import { PageError } from "../components/PageError";
 import { IK_PRESETS, imageKitOptimizedUrl } from "../lib/imagekitUrl";
 import { Link } from "react-router";
 import { formatPrice } from "../utils/format";
-import { Show, SignInButton } from "@clerk/react";
+import { Show, SignInButton, useAuth } from "@clerk/react";
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "../lib/api";
+import toast from "react-hot-toast";
 
 function CartPage() {
+  const { getToken, isSignedIn } = useAuth();
   const {
     checkout,
     checkoutLoading,
@@ -31,6 +35,29 @@ function CartPage() {
 
   const [podConfirmOpen, setPodConfirmOpen] = useState(false);
   const [deliveryLocation, setDeliveryLocation] = useState("");
+  const [missingAddressModalOpen, setMissingAddressModalOpen] = useState(false);
+
+  const { data: meData } = useQuery({
+    queryKey: ["me"],
+    queryFn: () => apiFetch("/api/me", { getToken }),
+    enabled: isSignedIn,
+  });
+
+  const savedAddress = meData?.user?.deliveryAddress ?? "";
+
+  const resolvedDeliveryLocation = deliveryLocation.trim() || savedAddress.trim();
+
+  const checkoutWithAddress = async (method) => {
+    if (!resolvedDeliveryLocation) {
+      setMissingAddressModalOpen(true);
+      return;
+    }
+    try {
+      await checkout(method, resolvedDeliveryLocation);
+    } catch (error) {
+      toast.error(error?.message || "Checkout failed");
+    }
+  };
 
   return (
     <div className="text-left">
@@ -152,7 +179,7 @@ function CartPage() {
               <div className="mt-6 space-y-2">
                 <button
                   type="button"
-                  onClick={() => checkout("paystack", deliveryLocation.trim())}
+                  onClick={() => checkoutWithAddress("paystack")}
                   disabled={checkoutLoading}
                   aria-busy={checkoutLoading}
                   className="btn btn-primary w-full gap-2"
@@ -214,7 +241,7 @@ function CartPage() {
               className="btn btn-primary"
               onClick={() => {
                 setPodConfirmOpen(false);
-                checkout("pod", deliveryLocation.trim());
+                checkoutWithAddress("pod");
               }}
             >
               Confirm Order
@@ -227,6 +254,23 @@ function CartPage() {
           onClick={() => setPodConfirmOpen(false)}
         />
       </dialog>
+
+      {missingAddressModalOpen ? (
+        <div className="modal modal-open bg-neutral/70 backdrop-blur-sm">
+          <div className="modal-box max-w-md border border-warning/30">
+            <h3 className="text-xl font-bold text-warning">Delivery Address Required</h3>
+            <p className="mt-3 text-sm text-base-content/75">
+              Add your delivery address before continuing with payment. You can enter it here in
+              cart or save it from Manage account.
+            </p>
+            <div className="modal-action">
+              <button className="btn btn-warning" onClick={() => setMissingAddressModalOpen(false)}>
+                Okay
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

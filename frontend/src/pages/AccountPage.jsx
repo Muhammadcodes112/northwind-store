@@ -3,7 +3,7 @@ import { useAuth } from "@clerk/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../lib/api";
 import toast from "react-hot-toast";
-import { MailIcon, PhoneCallIcon } from "lucide-react";
+import { MailIcon, MapPinIcon, PhoneCallIcon } from "lucide-react";
 
 function AccountPage() {
   const { getToken } = useAuth();
@@ -15,11 +15,13 @@ function AccountPage() {
 
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
 
   useEffect(() => {
     if (data?.user) {
       setPhone(data.user.whatsappNumber ?? "");
       setEmail(data.user.email ?? "");
+      setDeliveryAddress(data.user.deliveryAddress ?? "");
     }
   }, [data]);
 
@@ -49,6 +51,20 @@ function AccountPage() {
       queryClient.invalidateQueries({ queryKey: ["me"] });
     },
     onError: (err) => toast.error(err.message || "Could not update email."),
+  });
+
+  const saveAddressMutation = useMutation({
+    mutationFn: () =>
+      apiFetch("/api/me", {
+        method: "PATCH",
+        body: { deliveryAddress: deliveryAddress.trim() },
+        getToken,
+      }),
+    onSuccess: () => {
+      toast.success("Delivery address updated.");
+      queryClient.invalidateQueries({ queryKey: ["me"] });
+    },
+    onError: (err) => toast.error(err.message || "Could not update delivery address."),
   });
 
   const currentPhone = data?.user?.whatsappNumber ?? "";
@@ -111,6 +127,28 @@ function AccountPage() {
         disabled={saveEmailMutation.isPending || !email.trim()}
       >
         {saveEmailMutation.isPending ? "Saving..." : "Save email"}
+      </button>
+
+      <div className="mt-8 space-y-2">
+        <label className="label p-0">
+          <span className="label-text flex items-center gap-2">
+            <MapPinIcon className="size-4 text-primary" /> Delivery address
+          </span>
+        </label>
+        <textarea
+          className="textarea textarea-bordered w-full min-h-24"
+          placeholder="Enter your delivery address"
+          value={deliveryAddress}
+          onChange={(e) => setDeliveryAddress(e.target.value)}
+        />
+      </div>
+
+      <button
+        className="btn btn-accent mt-4"
+        onClick={() => saveAddressMutation.mutate()}
+        disabled={saveAddressMutation.isPending || !deliveryAddress.trim()}
+      >
+        {saveAddressMutation.isPending ? "Saving..." : "Save delivery address"}
       </button>
     </div>
   );

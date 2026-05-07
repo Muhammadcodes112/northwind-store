@@ -17,6 +17,7 @@ export const users = pgTable("users", {
   displayName: text("display_name"),
   role: text("role").$type<UserRole>().notNull().default("customer"),
   whatsappNumber: text("whatsapp_number"),
+  deliveryAddress: text("delivery_address"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

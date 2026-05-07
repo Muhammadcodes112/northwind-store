@@ -1,7 +1,7 @@
 import { Show, SignInButton, useAuth, UserButton } from "@clerk/react";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "../lib/api";
-import { Link, useNavigate } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 
 import {
@@ -87,8 +87,8 @@ const Navbar = () => {
               to="/"
               className="btn btn-ghost gap-2 px-1 lg:px-2 font-mono text-sm sm:text-base lg:text-xl font-semibold tracking-wide hover:bg-transparent"
             >
-              <img src="/brand-logo.png" alt="The Emporium Corner logo" className={`h-9 w-9 lg:h-10 lg:w-10 object-cover rounded-full ring-2 ring-base-300 shadow-sm ${profileHoverAnimation}`} />
-              <img src="/brand-text.png" alt="The Emporium Corner" className="h-5 sm:h-6 lg:h-7 w-auto object-contain" />
+              <img src="/brand-logo.png" alt="The Emporium Corner logo" className={`h-[3.2rem] w-[3.2rem] lg:h-10 lg:w-10 object-cover rounded-full shadow-sm ${profileHoverAnimation}`} />
+              <img src="/brand-text.png" alt="The Emporium Corner" className="h-7 sm:h-7 lg:h-8 w-auto object-contain mix-blend-screen" />
             </Link>
 
             <div className="flex items-center gap-1 lg:hidden">
@@ -138,35 +138,50 @@ const Navbar = () => {
           </div>
 
           <nav className="hidden lg:flex items-center gap-1.5">
-            <Link to="/" className="btn btn-ghost gap-2 font-medium">
+            <NavLink
+              to="/"
+              end
+              className={({ isActive }) =>
+                `btn btn-ghost gap-2 font-medium ${isActive ? "text-primary" : ""}`
+              }
+            >
               <ShoppingBagIcon className="size-6 opacity-90" aria-hidden />
               <span>Shop</span>
-            </Link>
+            </NavLink>
 
             {/* Desktop Search Bar */}
             <SearchForm className="w-48 focus-within:w-64" />
 
             <Show when={"signed-in"}>
-              <Link to="/orders" className="btn btn-ghost gap-2 font-medium">
+              <NavLink
+                to="/orders"
+                className={({ isActive }) =>
+                  `btn btn-ghost gap-2 font-medium ${isActive ? "text-primary" : ""}`
+                }
+              >
                 <PackageIcon className="size-6 opacity-90" aria-hidden />
                 <span>Orders</span>
-              </Link>
+              </NavLink>
 
               {role === "admin" ? (
-                <Link
+                <NavLink
                   to="/admin"
                   onClick={adminWelcome}
-                  className="btn btn-ghost px-2 gap-2 font-medium text-secondary"
+                  className={({ isActive }) =>
+                    `btn btn-ghost px-2 gap-2 font-medium ${isActive ? "text-primary" : "text-secondary"}`
+                  }
                 >
                   <SettingsIcon className="size-6" aria-hidden />
                   <span className="text-base">Admin</span>
-                </Link>
+                </NavLink>
               ) : null}
             </Show>
 
-            <Link
+            <NavLink
               to="/cart"
-              className="btn btn-ghost gap-2 font-medium indicator"
+              className={({ isActive }) =>
+                `btn btn-ghost gap-2 font-medium indicator ${isActive ? "text-primary" : ""}`
+              }
               aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : "Cart"}
             >
               {cartCount > 0 ? (
@@ -176,7 +191,7 @@ const Navbar = () => {
               ) : null}
               <ShoppingCartIcon className="size-6 opacity-90" aria-hidden />
               <span>Cart</span>
-            </Link>
+            </NavLink>
 
             <Show when={"signed-out"}>
               <button onClick={toggleTheme} className="btn btn-ghost btn-circle">

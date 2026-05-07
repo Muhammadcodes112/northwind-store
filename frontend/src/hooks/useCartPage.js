@@ -57,7 +57,7 @@ export default function useCartPage() {
       }
     } catch (error) {
       console.error("Checkout failed:", error);
-      alert("Checkout failed: " + (error.message || "Unknown error"));
+      throw error;
     } finally {
       setCheckoutLoading(false);
     }

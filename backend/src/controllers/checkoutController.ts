@@ -7,6 +7,7 @@ import { db } from "../db";
 import { CheckoutSessionLine, checkoutSessions, products } from "../db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import { paystackInitializeCheckout } from "../lib/paystack";
+import { notifyOrderCreated } from "../lib/orderNotifications";
 
 const env = getEnv();
 
@@ -120,6 +121,8 @@ export async function createCheckout(req: Request, res: Response, next: NextFunc
           });
         }
       });
+
+      notifyOrderCreated(order.id).catch(console.error);
 
       res.json({ checkoutUrl: successUrl.replace("{CHECKOUT_ID}", session.id) });
       return;

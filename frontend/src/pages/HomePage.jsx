@@ -16,73 +16,75 @@ function HomePage() {
 
   return (
     <div className="space-y-12">
-      <HomeHero products={products} loading={loadingList} />
+      {/* CATALOG CHIPS ABOVE SLIDER */}
+      <div className="mb-2 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between px-4 sm:px-0">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold text-base-content md:text-2xl uppercase font-mono">
+            All Categories
+          </h2>
+        </div>
 
-      {/* CATELOG */}
-      <section id="catolag" className="scroll-mt-24">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-base-content md:text-2xl uppercase font-mono">
-              All Categories
-            </h2>
-          </div>
+        <div className="flex flex-col sm:items-end gap-3">
+          <div
+            className="flex gap-5 overflow-x-auto whitespace-nowrap pb-1 -mx-1 pr-2
+            [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {categoryChipsLoading ? (
+              [1, 2, 3, 4, 5, 6].map((i) => (
+                <div
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={i}
+                  className="skeleton h-6 w-24 rounded-full"
+                  aria-hidden
+                />
+              ))
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className={`text-sm sm:text-base font-medium uppercase ${
+                    !categoryFilter
+                      ? "text-primary underline decoration-primary underline-offset-4"
+                      : "text-base-content/70"
+                  }`}
+                  onClick={() => setCategory("")}
+                >
+                  ALL
+                </button>
 
-          <div className="flex flex-col sm:items-end gap-3">
-            <div
-              className="flex gap-5 overflow-x-auto whitespace-nowrap pb-1 -mx-1 pr-2
-              [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            >
-              {categoryChipsLoading ? (
-                [1, 2, 3, 4, 5, 6].map((i) => (
-                  <div
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={i}
-                    className="skeleton h-6 w-24 rounded-full"
-                    aria-hidden
-                  />
-                ))
-              ) : (
-                <>
+                {[
+                  "PHARMACEUTICAL DRUGS",
+                  "COSMETICS",
+                  "BOUTIQUES",
+                  "ACCESSORIES",
+                  "KITCHEN UTENSILS",
+                  "PHONES",
+                  "CARS",
+                  "INTERIOR DECORATION",
+                  "OTHERS"
+                ].map((c) => (
                   <button
+                    key={c}
                     type="button"
-                    className={`text-sm sm:text-base font-medium ${
-                      !categoryFilter
+                    className={`text-sm sm:text-base font-medium uppercase ${
+                      categoryFilter?.toUpperCase() === c
                         ? "text-primary underline decoration-primary underline-offset-4"
                         : "text-base-content/70"
                     }`}
-                    onClick={() => setCategory("")}
+                    onClick={() => setCategory(c.toLowerCase())}
                   >
-                    All
+                    {c}
                   </button>
-
-                  {[
-                    "Pharmaceutical Drugs",
-                    "cosmetics",
-                    "Boutiques",
-                    "accessories",
-                    "kitchen utensils",
-                    "phones",
-                    "cars",
-                    "interior decoration",
-                  ].map((c) => (
-                    <button
-                      key={c}
-                      type="button"
-                      className={`text-sm sm:text-base font-medium ${
-                        categoryFilter === c
-                          ? "text-primary underline decoration-primary underline-offset-4"
-                          : "text-base-content/70"
-                      }`}
-                      onClick={() => setCategory(c)}
-                    >
-                      {c}
-                    </button>
-                  ))}
-                </>
-              )}
-            </div>
+                ))}
+              </>
+            )}
           </div>
         </div>
+      </div>
+
+      <HomeHero products={products} loading={loadingList} />
+
+      <section id="catolag" className="scroll-mt-24">
 
         {loadingList ? (
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">

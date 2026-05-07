@@ -85,6 +85,13 @@ export async function paystackWebhookHandler(req: Request, res: Response) {
         }
       });
       
+      const [order] = await db.select().from(orders).where(eq(orders.paystackReference, data.reference));
+      if (order) {
+        // @ts-ignore (dynamic import to avoid circular dependency issues if any, though it's fine here)
+        const { notifyOrderCreated } = await import("../lib/orderNotifications");
+        notifyOrderCreated(order.id).catch(console.error);
+      }
+      
       console.log(`Order created for Paystack ref ${data.reference}`);
 
     }

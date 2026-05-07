@@ -23,7 +23,7 @@ export function AdminProductsTab({ getToken }) {
   }
 
   return (
-    <div>
+    <div className="text-[11px] sm:text-[13.6px] lg:text-base">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-base-content">Catalog Products</h2>

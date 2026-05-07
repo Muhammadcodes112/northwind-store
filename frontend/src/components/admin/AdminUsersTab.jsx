@@ -61,7 +61,7 @@ export function AdminUsersTab({ getToken }) {
   const allUsers = usersData?.users || [];
 
   return (
-    <div className="space-y-8 text-[13px] sm:text-base">
+    <div className="space-y-8 text-[11px] sm:text-[13.6px] lg:text-base">
       {/* Stats Cards */}
       <div className="stats shadow bg-base-100 border border-base-300 w-full md:w-auto">
         <div className="stat">

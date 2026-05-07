@@ -89,10 +89,46 @@ export function PaymentModal({
     try {
       await onPaymentComplete();
       setStep(0);
-      toast.success("Payment confirmed. Thanks for patronizing us!", {
-        duration: 5000,
-        icon: "🎉",
-      });
+      toast.custom(
+        (t) => (
+          <div
+            className={`${
+              t.visible ? "animate-enter" : "animate-leave"
+            } max-w-sm w-full bg-base-100 shadow-2xl rounded-2xl pointer-events-auto flex flex-col ring-1 ring-base-300 overflow-hidden`}
+          >
+            <div className="p-4 flex items-start gap-4 bg-gradient-to-r from-primary/10 to-transparent">
+              <div className="flex-shrink-0 pt-0.5">
+                <img
+                  className="h-12 w-12 rounded-full object-cover shadow-sm ring-2 ring-primary/20"
+                  src="/logo.jpg"
+                  alt="The Emporium Corner"
+                  onError={(e) => { e.target.onerror = null; e.target.src = "/logo.png"; }}
+                />
+              </div>
+              <div className="flex-1 w-0">
+                <p className="text-sm font-bold text-primary">
+                  The Emporium Corner
+                </p>
+                <p className="mt-1 text-sm font-medium text-base-content leading-relaxed">
+                  Your order for <span className="font-bold">{items?.[0]?.product?.name || "products"}</span> has been completed.
+                </p>
+                <p className="mt-2 text-xs text-base-content/70 italic">
+                  Thanks for patronizing us!
+                </p>
+              </div>
+            </div>
+            <div className="bg-base-200/50 border-t border-base-300 p-2 flex justify-end">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="btn btn-sm btn-ghost text-primary w-full"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        ),
+        { duration: 6000 }
+      );
     } catch (error) {
       toast.error(error?.message || "Could not complete order. Please try again.");
     }
@@ -261,17 +297,38 @@ export function PaymentModal({
       )}
 
       {requirementsModalOpen && (
-        <div className="modal modal-open bg-neutral/70 backdrop-blur-sm">
-          <div className="modal-box max-w-md border border-warning/30">
-            <h3 className="text-xl font-bold text-warning">Complete Your Profile First</h3>
-            <p className="mt-3 text-sm text-base-content/75">
-              Payment can only continue after adding your phone number in Manage account and
-              setting your delivery location on the cart page.
-            </p>
-            <div className="modal-action">
-              <button className="btn btn-warning" onClick={() => setRequirementsModalOpen(false)}>
-                Okay
-              </button>
+        <div className="modal modal-open bg-neutral/80 backdrop-blur-md">
+          <div className="modal-box max-w-sm p-0 overflow-hidden bg-base-100 rounded-2xl border-2 border-warning/50 shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="bg-warning/10 p-6 flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-warning/20 flex items-center justify-center mb-4 text-warning">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-black tracking-tight text-warning">Wait!</h3>
+              <p className="mt-2 text-sm font-medium text-base-content/80">
+                You need to complete your details before proceeding.
+              </p>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <ul className="space-y-3 text-sm text-base-content/75 font-medium">
+                <li className="flex items-center gap-2">
+                  <span className="text-error">✗</span> Phone number is missing
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-error">✗</span> Delivery location is missing
+                </li>
+              </ul>
+              
+              <div className="pt-2 mt-4 border-t border-base-200">
+                <button 
+                  className="btn btn-warning w-full shadow-lg font-bold" 
+                  onClick={() => setRequirementsModalOpen(false)}
+                >
+                  I'll add them now
+                </button>
+              </div>
             </div>
           </div>
         </div>

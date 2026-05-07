@@ -59,6 +59,12 @@ export default function Footer() {
               Built for teams who care about clear specs, fast fulfillment, and human support when
               it matters.
             </p>
+            <div className="mt-4">
+              <h4 className="text-[10px] sm:text-xs font-semibold text-base-content/50">Location</h4>
+              <p className="mt-1 text-xs sm:text-sm text-base-content/70">
+                No. 116 Zaria Road, Rigasa Kaduna.
+              </p>
+            </div>
           </div>
         </div>
 

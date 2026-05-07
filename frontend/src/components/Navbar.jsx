@@ -87,8 +87,22 @@ const Navbar = () => {
               to="/"
               className="btn btn-ghost gap-2 px-1 lg:px-2 font-mono text-sm sm:text-base lg:text-xl font-semibold tracking-wide hover:bg-transparent"
             >
-              <img src="/brand-logo.png" alt="The Emporium Corner logo" className={`h-[3.2rem] w-[3.2rem] lg:h-10 lg:w-10 object-cover rounded-full shadow-sm ${profileHoverAnimation}`} />
-              <img src="/brand-text.png" alt="The Emporium Corner" className="h-7 sm:h-7 lg:h-8 w-auto object-contain mix-blend-screen" />
+              <span
+                className={`rounded-full ${theme === "light" ? "bg-base-100 p-1" : ""}`}
+              >
+                <img
+                  src="/brand-logo.png"
+                  alt="The Emporium Corner logo"
+                  className={`h-[3.84rem] w-[3.84rem] lg:h-10 lg:w-10 object-cover rounded-full shadow-sm ${profileHoverAnimation}`}
+                />
+              </span>
+              <img
+                src="/brand-text.png"
+                alt="The Emporium Corner"
+                className={`h-9 sm:h-9 lg:h-8 w-auto object-contain ${
+                  theme === "light" ? "invert brightness-0" : ""
+                }`}
+              />
             </Link>
 
             <div className="flex items-center gap-1 lg:hidden">
@@ -96,7 +110,7 @@ const Navbar = () => {
                 <Link
                   to="/admin"
                   onClick={adminWelcome}
-                  className="btn btn-ghost px-2 gap-1 font-medium text-secondary"
+                  className={`btn btn-ghost px-2 gap-1 font-medium text-primary`}
                 >
                   <SettingsIcon className="size-5" aria-hidden />
                   <span className="text-sm">Admin</span>
@@ -168,7 +182,7 @@ const Navbar = () => {
                   to="/admin"
                   onClick={adminWelcome}
                   className={({ isActive }) =>
-                    `btn btn-ghost px-2 gap-2 font-medium ${isActive ? "text-primary" : "text-secondary"}`
+                    `btn btn-ghost px-2 gap-2 font-medium text-primary`
                   }
                 >
                   <SettingsIcon className="size-6" aria-hidden />

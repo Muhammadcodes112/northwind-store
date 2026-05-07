@@ -3,8 +3,9 @@ import type { NextFunction, Response, Request } from "express";
 import { getLocalUser } from "../lib/users";
 import { isStaff } from "../lib/roles";
 import { db } from "../db";
-import { orderItems, orders, products } from "../db/schema";
+import { orderItems, orders, products, users } from "../db/schema";
 import { asc, desc, eq, inArray } from "drizzle-orm";
+import { notifyOrderCompleted } from "../lib/orderNotifications";
 
 export async function listOrders(req: Request, res: Response, next: NextFunction) {
   try {
@@ -207,6 +208,8 @@ export async function completeOrder(req: Request, res: Response, next: NextFunct
       .set({ status: "completed", updatedAt: new Date() })
       .where(eq(orders.id, order.id))
       .returning();
+
+    notifyOrderCompleted(updatedOrder.id).catch(console.error);
 
     res.json({ order: updatedOrder });
   } catch (e) {

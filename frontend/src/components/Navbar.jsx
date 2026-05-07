@@ -93,15 +93,14 @@ const Navbar = () => {
                 <img
                   src="/brand-logo.png"
                   alt="The Emporium Corner logo"
-                  className={`h-[3.84rem] w-[3.84rem] lg:h-10 lg:w-10 object-cover rounded-full shadow-sm ${profileHoverAnimation}`}
+                  className={`h-[2.88rem] w-[2.88rem] lg:h-10 lg:w-10 object-cover rounded-full shadow-sm ${profileHoverAnimation}`}
                 />
               </span>
               <img
                 src="/brand-text.png"
                 alt="The Emporium Corner"
-                className={`h-9 sm:h-9 lg:h-8 w-auto object-contain ${
-                  theme === "light" ? "invert brightness-0" : ""
-                }`}
+                className={`h-9 sm:h-9 lg:h-8 w-auto object-contain`}
+                style={{ filter: theme === 'light' ? 'invert(1)' : 'none' }}
               />
             </Link>
 
@@ -110,7 +109,7 @@ const Navbar = () => {
                 <Link
                   to="/admin"
                   onClick={adminWelcome}
-                  className={`btn btn-ghost px-2 gap-1 font-medium text-primary`}
+                  className="btn btn-ghost px-2 gap-1 font-medium text-primary !flex"
                 >
                   <SettingsIcon className="size-5" aria-hidden />
                   <span className="text-sm">Admin</span>
@@ -182,7 +181,7 @@ const Navbar = () => {
                   to="/admin"
                   onClick={adminWelcome}
                   className={({ isActive }) =>
-                    `btn btn-ghost px-2 gap-2 font-medium text-primary`
+                    `btn btn-ghost px-2 gap-2 font-medium text-primary !flex`
                   }
                 >
                   <SettingsIcon className="size-6" aria-hidden />

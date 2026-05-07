@@ -100,6 +100,7 @@ export async function createCheckout(req: Request, res: Response, next: NextFunc
     if (parsed.data.method === "pod") {
       // Pay on delivery: create the order immediately as pending
       const { orders, orderItems } = await import("../db/schema.js");
+      let newOrderId = "";
       await db.transaction(async (tx) => {
         const [order] = await tx
           .insert(orders)
@@ -111,6 +112,8 @@ export async function createCheckout(req: Request, res: Response, next: NextFunc
             // no paystack reference for POD
           })
           .returning();
+        
+        newOrderId = order.id;
 
         for (const line of lines) {
           await tx.insert(orderItems).values({
@@ -122,7 +125,7 @@ export async function createCheckout(req: Request, res: Response, next: NextFunc
         }
       });
 
-      notifyOrderCreated(order.id).catch(console.error);
+      notifyOrderCreated(newOrderId).catch(console.error);
 
       res.json({ checkoutUrl: successUrl.replace("{CHECKOUT_ID}", session.id) });
       return;

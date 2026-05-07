@@ -3,7 +3,7 @@ import type { NextFunction, Response, Request } from "express";
 import { getLocalUser } from "../lib/users";
 import { isStaff } from "../lib/roles";
 import { db } from "../db";
-import { orderItems, orders, products, users } from "../db/schema";
+import { orderItems, orders, products } from "../db/schema";
 import { asc, desc, eq, inArray } from "drizzle-orm";
 import { notifyOrderCompleted } from "../lib/orderNotifications";
 

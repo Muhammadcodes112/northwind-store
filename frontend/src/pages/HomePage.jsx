@@ -24,9 +24,9 @@ function HomePage() {
           </h2>
         </div>
 
-        <div className="flex flex-col sm:items-end gap-3">
+        <div className="flex flex-col sm:items-end gap-3 w-full max-w-[100vw] sm:max-w-[70%]">
           <div
-            className="flex gap-5 overflow-x-auto whitespace-nowrap pb-1 -mx-1 pr-2
+            className="flex gap-4 overflow-x-auto whitespace-nowrap pb-2 w-full
             [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {categoryChipsLoading ? (
@@ -42,7 +42,7 @@ function HomePage() {
               <>
                 <button
                   type="button"
-                  className={`text-sm sm:text-base font-medium uppercase ${
+                  className={`text-[10.5px] sm:text-[12px] font-medium uppercase ${
                     !categoryFilter
                       ? "text-primary underline decoration-primary underline-offset-4"
                       : "text-base-content/70"
@@ -66,7 +66,7 @@ function HomePage() {
                   <button
                     key={c}
                     type="button"
-                    className={`text-sm sm:text-base font-medium uppercase ${
+                    className={`text-[10.5px] sm:text-[12px] font-medium uppercase ${
                       categoryFilter?.toUpperCase() === c
                         ? "text-primary underline decoration-primary underline-offset-4"
                         : "text-base-content/70"

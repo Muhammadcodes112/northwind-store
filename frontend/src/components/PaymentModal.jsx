@@ -20,6 +20,7 @@ export function PaymentModal({
   const [step, setStep] = useState(0);
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds
   const [phoneRequiredOpen, setPhoneRequiredOpen] = useState(false);
+  const [receiptReminder, setReceiptReminder] = useState(false);
 
   useEffect(() => {
     let timer;
@@ -82,17 +83,28 @@ export function PaymentModal({
     return encodeURIComponent(message);
   })();
 
-  const handlePaymentMade = async () => {
+  const confirmComplete = async () => {
     try {
       await onPaymentComplete();
       setStep(0);
-      toast.success("Payment confirmed. Order marked as completed.", {
+      toast.success("Payment confirmed. Thanks for patronizing us!", {
         duration: 5000,
         icon: "🎉",
       });
     } catch (error) {
       toast.error(error?.message || "Could not complete order. Please try again.");
     }
+  };
+
+  const handlePaymentMade = () => {
+    setReceiptReminder(false);
+    setStep(3);
+  };
+
+  const handlePaymentNotSent = () => {
+    setReceiptReminder(true);
+    setStep(2);
+    toast.error("Please send your receipt to admin first, then confirm payment.");
   };
 
   return (
@@ -150,6 +162,15 @@ export function PaymentModal({
                   </div>
                 </div>
 
+                {receiptReminder ? (
+                  <div className="alert alert-warning mb-4">
+                    <span>
+                      We&apos;re not marking the order complete yet. Please click “Send Receipt to
+                      Admin” first.
+                    </span>
+                  </div>
+                ) : null}
+
                 <div className="space-y-4 py-2">
                   <div className="bg-base-200/60 p-4 rounded-xl border border-base-300 space-y-2">
                     <div className="flex justify-between items-center">
@@ -201,6 +222,35 @@ export function PaymentModal({
                   >
                     {isCompleting ? "Completing..." : "Payment Made"}
                   </button>
+                </div>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="animate-in fade-in zoom-in duration-300 text-left">
+                <div className="flex justify-between items-center mb-4 border-b border-base-300 pb-3">
+                  <h3 className="font-bold text-xl text-base-content">Confirm Payment</h3>
+                  <div className="badge badge-success badge-lg p-3 font-mono shadow-sm">Step 3</div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="bg-base-200/60 p-4 rounded-xl border border-base-300 text-sm leading-relaxed">
+                    Are you sure you have made the payment and already sent your receipt to the
+                    admin?
+                  </div>
+
+                  <div className="modal-action flex-col sm:flex-row gap-2 mt-4">
+                    <button className="btn btn-warning w-full sm:w-auto" onClick={handlePaymentNotSent}>
+                      No, go back
+                    </button>
+                    <button
+                      className="btn btn-success w-full sm:w-auto"
+                      onClick={confirmComplete}
+                      disabled={isCompleting}
+                    >
+                      Yes, confirm payment
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

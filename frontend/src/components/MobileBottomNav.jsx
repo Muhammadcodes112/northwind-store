@@ -1,10 +1,11 @@
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useAuth, UserButton, SignInButton } from "@clerk/react";
 import { HomeIcon, PackageIcon, ShoppingCartIcon, UserIcon, MoonIcon, SunIcon } from "lucide-react";
 import { useCart } from "../store/cart";
 
 export function MobileBottomNav() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { isSignedIn } = useAuth();
   const cartItemsCount = useCart((state) => state.items.length);
 
@@ -12,7 +13,7 @@ export function MobileBottomNav() {
 
   return (
     <div 
-      className="fixed bottom-0 left-0 right-0 z-[100] flex items-center justify-around bg-base-100 border-t border-base-200 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] lg:hidden pt-2 rounded-t-2xl"
+      className="fixed bottom-0 left-0 right-0 z-100 flex items-center justify-around bg-base-100 border-t border-base-200 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] lg:hidden pt-2 rounded-t-2xl"
       style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
     >
       <Link to="/" className={`flex flex-col items-center justify-center gap-1 w-full h-full pb-1 ${isActive("/") ? "text-primary" : "text-base-content/70"}`}>
@@ -41,6 +42,8 @@ export function MobileBottomNav() {
         {isSignedIn ? (
           <div className="flex items-center justify-center h-6">
             <UserButton
+              userProfileMode="navigation"
+              userProfileUrl="/account"
               appearance={{
                 elements: {
                   userButtonAvatarBox: "size-6",
@@ -48,6 +51,7 @@ export function MobileBottomNav() {
               }}
             >
               <UserButton.MenuItems>
+                <UserButton.Action label="Manage account" onClick={() => navigate("/account")} />
                 <UserButton.Action 
                   label="Dark / Light Theme"
                   labelIcon={<MoonIcon className="size-4" />} 

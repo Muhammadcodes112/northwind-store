@@ -28,29 +28,58 @@ function HomePage() {
           </div>
 
           <div className="flex flex-col sm:items-end gap-3">
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                className={`btn btn-sm ${!categoryFilter ? "btn-primary" : "btn-ghost border border-base-300"}`}
-                onClick={() => setCategory("")}
-              >
-                All Categories
-              </button>
+            <div
+              className="flex gap-5 overflow-x-auto whitespace-nowrap pb-1 -mx-1 pr-2
+              [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              {categoryChipsLoading ? (
+                [1, 2, 3, 4, 5, 6].map((i) => (
+                  <div
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={i}
+                    className="skeleton h-6 w-24 rounded-full"
+                    aria-hidden
+                  />
+                ))
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className={`text-sm sm:text-base font-medium ${
+                      !categoryFilter
+                        ? "text-primary underline decoration-primary underline-offset-4"
+                        : "text-base-content/70"
+                    }`}
+                    onClick={() => setCategory("")}
+                  >
+                    All
+                  </button>
 
-              {categoryChipsLoading
-                ? [1, 2, 3, 4].map((i) => (
-                    <div key={i} className="skeleton h-8 w-20 rounded-lg" aria-hidden />
-                  ))
-                : ["Pharmaceutical Drugs", "cosmetics", "Boutiques", "accessories", "kitchen utensils", "phones", "cars", "interior decoration"].map((c) => (
+                  {[
+                    "Pharmaceutical Drugs",
+                    "cosmetics",
+                    "Boutiques",
+                    "accessories",
+                    "kitchen utensils",
+                    "phones",
+                    "cars",
+                    "interior decoration",
+                  ].map((c) => (
                     <button
                       key={c}
                       type="button"
-                      className={`btn btn-sm ${categoryFilter === c ? "btn-primary" : "btn-ghost border border-base-300"}`}
+                      className={`text-sm sm:text-base font-medium ${
+                        categoryFilter === c
+                          ? "text-primary underline decoration-primary underline-offset-4"
+                          : "text-base-content/70"
+                      }`}
                       onClick={() => setCategory(c)}
                     >
                       {c}
                     </button>
                   ))}
+                </>
+              )}
             </div>
           </div>
         </div>

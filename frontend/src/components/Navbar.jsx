@@ -79,7 +79,7 @@ const Navbar = () => {
     });
 
   return (
-    <header className="sticky top-0 z-50 border-b border-base-300 bg-base-100/95 shadow-sm backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-base-300 bg-base-100/95 shadow-sm backdrop-blur-md rounded-b-2xl overflow-hidden lg:rounded-none">
       <div className="mx-auto flex flex-col gap-1.5 max-w-7xl px-4 py-2 md:px-6 md:py-3">
         <div className="navbar p-0 min-h-0 flex-col lg:flex-row items-center justify-between gap-2.5 lg:gap-0">
           <div className="w-full lg:w-auto flex items-center justify-between">
@@ -87,7 +87,7 @@ const Navbar = () => {
               to="/"
               className="btn btn-ghost gap-2 px-1 lg:px-2 font-mono text-sm sm:text-base lg:text-xl font-semibold tracking-wide hover:bg-transparent"
             >
-              <img src="/logo.jpg" alt="Logo" className={`h-7 w-7 lg:h-10 lg:w-10 object-cover rounded-full ring-2 ring-base-300 shadow-sm ${profileHoverAnimation}`} onError={(e) => { e.target.onerror = null; e.target.src = "/logo.png"; }} />
+              <img src="/logo.jpg" alt="Logo" className={`h-9 w-9 lg:h-10 lg:w-10 object-cover rounded-full ring-2 ring-base-300 shadow-sm ${profileHoverAnimation}`} onError={(e) => { e.target.onerror = null; e.target.src = "/logo.png"; }} />
               <span>
                 <span className={theme === "dark" ? "text-neutral-900" : "text-base-content"}>T</span>he Emporium Corner
               </span>

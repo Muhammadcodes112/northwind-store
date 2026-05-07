@@ -273,6 +273,11 @@ export async function listAdminOrders(_req: Request, res: Response, next: NextFu
       orderBy: [desc(orders.createdAt)],
       with: {
         user: true,
+        items: {
+          with: {
+            product: true,
+          },
+        },
       },
     });
     res.json({ orders: rows });

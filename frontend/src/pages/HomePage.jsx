@@ -19,7 +19,7 @@ function HomePage() {
       {/* CATALOG CHIPS ABOVE SLIDER */}
       <div className="mb-2 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between px-4 sm:px-0">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-base-content md:text-2xl uppercase font-mono">
+          <h2 className="text-base sm:text-lg font-bold text-base-content uppercase font-mono">
             All Categories
           </h2>
         </div>

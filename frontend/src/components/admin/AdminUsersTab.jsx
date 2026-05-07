@@ -27,13 +27,17 @@ export function AdminUsersTab({ getToken }) {
         getToken,
       }),
     onSuccess: () => {
-      toast.success("Admin role granted successfully");
+      toast.success("Admin role granted successfully", {
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      });
       setEmail("");
       queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "stats"] });
     },
     onError: (err) => {
-      toast.error(err.message || "Failed to add admin");
+      toast.error(err.message || "Failed to add admin", {
+        style: { borderRadius: '10px', background: '#ef4444', color: '#fff' }
+      });
     },
   });
 
@@ -44,11 +48,15 @@ export function AdminUsersTab({ getToken }) {
         getToken,
       }),
     onSuccess: () => {
-      toast.success("Admin role removed successfully");
+      toast.success("Admin role removed successfully", {
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      });
       queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
     },
     onError: (err) => {
-      toast.error(err.message || "Failed to remove admin");
+      toast.error(err.message || "Failed to remove admin", {
+        style: { borderRadius: '10px', background: '#ef4444', color: '#fff' }
+      });
     },
   });
 

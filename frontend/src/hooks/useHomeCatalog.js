@@ -51,7 +51,8 @@ export function useHomeCatalog() {
     const lowerQ = searchQuery.toLowerCase();
     products = products.filter((p) => 
       p.name.toLowerCase().includes(lowerQ) || 
-      (p.description && p.description.toLowerCase().includes(lowerQ))
+      (p.description && p.description.toLowerCase().includes(lowerQ)) ||
+      (p.category && p.category.toLowerCase().includes(lowerQ))
     );
   }
 

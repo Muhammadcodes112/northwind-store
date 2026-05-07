@@ -12,6 +12,7 @@ import {
   addAdmin,
   removeAdmin,
   listAdminOrders,
+  getAdminOrder,
   updateAdminOrderStatus,
 } from "../controllers/adminController";
 
@@ -32,6 +33,7 @@ router.post("/admins", addAdmin);
 router.delete("/admins/:id", removeAdmin);
 
 router.get("/orders", listAdminOrders);
+router.get("/orders/:id", getAdminOrder);
 router.patch("/orders/:id/status", updateAdminOrderStatus);
 
 export default router;

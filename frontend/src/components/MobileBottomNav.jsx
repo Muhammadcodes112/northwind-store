@@ -46,7 +46,7 @@ export function MobileBottomNav() {
               userProfileUrl="/account"
               appearance={{
                 elements: {
-                  userButtonAvatarBox: "size-6",
+                  userButtonAvatarBox: "size-7",
                 },
               }}
             >

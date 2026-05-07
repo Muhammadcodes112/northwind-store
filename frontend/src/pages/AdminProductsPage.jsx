@@ -23,12 +23,12 @@ function AdminProductsPage() {
   }
 
   return (
-    <div className="text-left space-y-6">
+    <div className="text-left text-sm sm:text-base space-y-6">
       <div className="flex items-center gap-3 border-b border-base-300 pb-4">
         <LayoutDashboardIcon className="size-8 text-secondary" />
         <div>
-          <h1 className="text-2xl font-bold text-base-content">Admin Dashboard</h1>
-          <p className="text-sm text-base-content/60">Manage The Emporium Corner store</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-base-content">Admin Dashboard</h1>
+          <p className="text-xs sm:text-sm text-base-content/60">Manage The Emporium Corner store</p>
         </div>
       </div>
 

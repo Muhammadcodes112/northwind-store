@@ -88,7 +88,7 @@ const Navbar = () => {
               className="btn btn-ghost gap-2 px-1 lg:px-2 font-mono text-sm sm:text-base lg:text-xl font-semibold tracking-wide hover:bg-transparent"
             >
               <img src="/logo.jpg" alt="Logo" className={`h-9 w-9 lg:h-10 lg:w-10 object-cover rounded-full ring-2 ring-base-300 shadow-sm ${profileHoverAnimation}`} onError={(e) => { e.target.onerror = null; e.target.src = "/logo.png"; }} />
-              <span>
+              <span className="text-[12.5px] sm:text-base lg:text-xl">
                 <span className={theme === "dark" ? "text-neutral-900" : "text-base-content"}>T</span>he Emporium Corner
               </span>
             </Link>
@@ -120,7 +120,7 @@ const Navbar = () => {
                 <UserButton
                   userProfileMode="navigation"
                   userProfileUrl="/account"
-                  appearance={{ elements: { avatarBox: `h-8 w-8 ring-2 ring-base-300 ${profileHoverAnimation}` } }}
+                  appearance={{ elements: { avatarBox: `h-10 w-10 ring-2 ring-base-300 ${profileHoverAnimation}` } }}
                 >
                   <UserButton.MenuItems>
                     <UserButton.Action label="Manage account" onClick={() => navigate("/account")} />
@@ -197,7 +197,7 @@ const Navbar = () => {
                 <UserButton
                   userProfileMode="navigation"
                   userProfileUrl="/account"
-                  appearance={{ elements: { avatarBox: `h-10 w-10 ring-2 ring-base-300 ${profileHoverAnimation}` } }}
+                  appearance={{ elements: { avatarBox: `h-12 w-12 ring-2 ring-base-300 ${profileHoverAnimation}` } }}
                 >
                   <UserButton.MenuItems>
                     <UserButton.Action label="Manage account" onClick={() => navigate("/account")} />

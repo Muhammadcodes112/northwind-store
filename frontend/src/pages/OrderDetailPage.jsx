@@ -55,11 +55,11 @@ function OrderDetailPage() {
                 Order details
               </p>
 
-              <h1 className="mt-1 font-mono text-2xl font-bold tracking-tight text-base-content sm:text-3xl">
+              <h1 className="mt-1 font-mono text-xl font-bold tracking-tight text-base-content sm:text-2xl">
                 #{order.id.slice(0, 8)}
               </h1>
 
-              <p className="mt-2 text-sm text-base-content/70">
+              <p className="mt-2 text-xs sm:text-sm text-base-content/70">
                 {formatOrderWhen(order.createdAt, { dateStyle: "full" })}
               </p>
               <p className="mt-2 break-all font-mono text-xs text-base-content/45">{order.id}</p>
@@ -95,7 +95,7 @@ function OrderDetailPage() {
                 <p className="text-xs font-medium uppercase tracking-wide text-base-content/50">
                   Order total
                 </p>
-                <p className="text-2xl font-bold tabular-nums text-base-content sm:text-3xl">
+                <p className="text-xl font-bold tabular-nums text-base-content sm:text-2xl">
                   {formatPrice(order.totalCents, "usd")}
                 </p>
               </div>
@@ -106,7 +106,7 @@ function OrderDetailPage() {
         <div>
           <div className="flex items-center gap-2 border-b border-base-300 pb-3">
             <LayoutListIcon className="size-5 text-primary" aria-hidden />
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-base-content">
+            <h2 className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-base-content">
               Order Summary
             </h2>
           </div>

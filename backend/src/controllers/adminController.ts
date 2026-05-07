@@ -286,6 +286,57 @@ export async function listAdminOrders(_req: Request, res: Response, next: NextFu
   }
 }
 
+export async function getAdminOrder(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = req.params.id as string;
+
+    const [order] = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.id, id))
+      .limit(1);
+
+    if (!order) {
+      res.status(404).json({ error: "Order not found" });
+      return;
+    }
+
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, order.userId))
+      .limit(1);
+
+    const itemRows = await db
+      .select({
+        id: orderItems.id,
+        quantity: orderItems.quantity,
+        unitPriceCents: orderItems.unitPriceCents,
+        productId: products.id,
+        productName: products.name,
+        productImageUrl: products.imageUrl,
+      })
+      .from(orderItems)
+      .innerJoin(products, eq(orderItems.productId, products.id))
+      .where(eq(orderItems.orderId, order.id));
+
+    const items = itemRows.map((r) => ({
+      id: r.id,
+      quantity: r.quantity,
+      unitPriceCents: r.unitPriceCents,
+      product: {
+        id: r.productId,
+        name: r.productName,
+        imageUrl: r.productImageUrl,
+      },
+    }));
+
+    res.json({ order: { ...order, user, items } });
+  } catch (e) {
+    next(e);
+  }
+}
+
 export async function updateAdminOrderStatus(req: Request, res: Response, next: NextFunction) {
   try {
     const id = req.params.id as string;

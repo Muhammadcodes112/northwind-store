@@ -11,6 +11,7 @@ import { SentryDemoPage } from "./pages/SentryDemoPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
 import OrderSummaryPage from "./pages/OrderSummaryPage";
 import AdminProductsPage from "./pages/AdminProductsPage";
+import AdminOrderDetailPage from "./pages/AdminOrderDetailPage";
 import AccountPage from "./pages/AccountPage";
 
 function App() {
@@ -36,6 +37,11 @@ function App() {
         <Route
           path="/admin"
           element={isSignedIn ? <AdminProductsPage /> : <Navigate to="/" replace />}
+        />
+
+        <Route
+          path="/admin/orders/:id"
+          element={isSignedIn ? <AdminOrderDetailPage /> : <Navigate to="/" replace />}
         />
 
         {/* NESTED ROUTES */}

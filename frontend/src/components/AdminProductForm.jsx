@@ -8,6 +8,8 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
   const [category, setCategory] = useState(initial?.category ?? "General");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [priceCents, setPriceCents] = useState(initial ? String(initial.priceCents / 100) : "");
+  const [discountPriceCents, setDiscountPriceCents] = useState(initial && initial.discountPriceCents ? String(initial.discountPriceCents / 100) : "");
+  const [stock, setStock] = useState(initial ? String(initial.stock ?? 0) : "0");
   const [currency, setCurrency] = useState(initial?.currency ?? "ngn");
   const [imageUrl, setImageUrl] = useState(initial?.imageUrl ?? "");
   const [imageKitFileId, setImageKitFileId] = useState(initial?.imageKitFileId ?? "");
@@ -30,6 +32,8 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
       imageUrl: imageUrl.trim() || null,
       imageKitFileId: imageKitFileId.trim() || null,
       active,
+      discountPriceCents: discountPriceCents ? Math.round(Number.parseFloat(discountPriceCents) * 100) : null,
+      stock: Number.parseInt(stock, 10) || 0,
     };
 
     if (initial) {
@@ -44,6 +48,8 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
         patch.imageKitFileId = body.imageKitFileId;
       }
       if (body.active !== initial.active) patch.active = body.active;
+      if (body.discountPriceCents !== (initial.discountPriceCents ?? null)) patch.discountPriceCents = body.discountPriceCents;
+      if (body.stock !== (initial.stock ?? 0)) patch.stock = body.stock;
       if (Object.keys(patch).length === 0) {
         onCancel();
         return;
@@ -128,7 +134,7 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
         />
       </label>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label className="form-control">
           <span className="label-text">Price (NGN)</span>
           <input
@@ -139,6 +145,29 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
             value={priceCents}
             onChange={(e) => setPriceCents(e.target.value)}
             required
+          />
+        </label>
+        
+        <label className="form-control">
+          <span className="label-text">Discount Price (NGN) <span className="text-base-content/50 text-xs">Optional</span></span>
+          <input
+            className="input input-bordered"
+            type="number"
+            step="0.01"
+            min="0.01"
+            value={discountPriceCents}
+            onChange={(e) => setDiscountPriceCents(e.target.value)}
+          />
+        </label>
+
+        <label className="form-control">
+          <span className="label-text">Stock</span>
+          <input
+            className="input input-bordered"
+            type="number"
+            min="0"
+            value={stock}
+            onChange={(e) => setStock(e.target.value)}
           />
         </label>
 

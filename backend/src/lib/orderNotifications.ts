@@ -10,7 +10,7 @@ export async function sendPendingOrderAdminReminders() {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) return;
 
-  const threshold = new Date(Date.now() - 20 * 60 * 1000);
+  const threshold = new Date(Date.now() - 5 * 60 * 1000);
 
   const dueOrders = await db
     .select()
@@ -58,7 +58,7 @@ export async function sendPendingOrderAdminReminders() {
         subject: `Order Pending Confirmation: #${order.id.slice(0, 8)}`,
         html: `
           <h2>Order Alert</h2>
-          <p>The customer has not cancelled this order in 20 minutes.</p>
+          <p>The customer has not cancelled this order in 5 minutes.</p>
           <p><strong>Order Code:</strong> #${order.id.slice(0, 8)}</p>
           <p><strong>Delivery Location:</strong> ${order.deliveryLocation ?? "Not provided"}</p>
           <p><strong>Total:</strong> ${currencyFromCents(order.totalCents)}</p>

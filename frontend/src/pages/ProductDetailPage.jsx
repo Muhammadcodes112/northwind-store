@@ -58,7 +58,7 @@ function ProductDetailPage() {
       </nav>
 
       <div className="mt-6 grid gap-10 lg:grid-cols-2 lg:gap-14">
-        <div className="card overflow-hidden border border-base-300 bg-base-100 shadow-lg">
+        <div className="card overflow-hidden border border-base-300 bg-base-100 shadow-lg mx-auto w-[60%] sm:w-full">
           <figure className="aspect-square bg-base-300">
             {p.imageUrl ? (
               <img
@@ -92,15 +92,31 @@ function ProductDetailPage() {
           <div className="flex flex-wrap items-center gap-2">
             <span className="badge badge-primary badge-outline">{category}</span>
             <span className="text-xs font-mono text-base-content/45">{p.slug}</span>
+            {p.stock !== undefined && (
+              <span className={`badge ${p.stock > 0 ? 'badge-success' : 'badge-error'} text-white`}>
+                {p.stock > 0 ? `${p.stock} in stock` : 'Out of stock'}
+              </span>
+            )}
           </div>
 
           <h1 className="mt-3 text-3xl font-bold tracking-tight text-base-content md:text-4xl">
             {p.name}
           </h1>
 
-          <p className="mt-3 text-3xl font-bold tabular-nums text-primary md:text-4xl">
-            {formatPrice(p.priceCents, p.currency)}
-          </p>
+          {p.discountPriceCents ? (
+            <div className="mt-3 flex flex-col">
+              <span className="text-xl font-bold tabular-nums text-base-content/50 line-through">
+                {formatPrice(p.priceCents, p.currency)}
+              </span>
+              <span className="text-4xl md:text-5xl font-extrabold tabular-nums text-primary">
+                {formatPrice(p.discountPriceCents, p.currency)}
+              </span>
+            </div>
+          ) : (
+            <p className="mt-3 text-3xl font-bold tabular-nums text-primary md:text-4xl">
+              {formatPrice(p.priceCents, p.currency)}
+            </p>
+          )}
 
           <p className="mt-6 text-base leading-relaxed text-base-content/85">{p.description}</p>
 

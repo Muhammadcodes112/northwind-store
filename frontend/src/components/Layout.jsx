@@ -1,6 +1,7 @@
 import Footer from "./Footer";
 import Navbar from "./Navbar";
 import { MobileBottomNav } from "./MobileBottomNav";
+import { FloatingSupportButton } from "./FloatingSupportButton";
 
 function Layout({ children }) {
   return (
@@ -14,6 +15,7 @@ function Layout({ children }) {
 
       <Footer />
       <MobileBottomNav />
+      <FloatingSupportButton phoneNumber="2348133180063" />
     </div>
   );
 }

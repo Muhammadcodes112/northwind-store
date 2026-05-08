@@ -3,6 +3,7 @@ import { HomeHero } from "../components/HomeHero";
 import { PageError } from "../components/PageError";
 import { TrustStrip } from "../components/TrustStrip";
 import { useHomeCatalog } from "../hooks/useHomeCatalog";
+import { TextTicker } from "../components/TextTicker";
 
 function HomePage() {
   const {
@@ -83,6 +84,8 @@ function HomePage() {
       </div>
 
       <HomeHero products={products} loading={loadingList} />
+      
+      <TextTicker />
 
       <section id="catolag" className="scroll-mt-24">
 

@@ -34,6 +34,8 @@ export const products = pgTable("products", {
   /** ImageKit `fileId` for deletes */
   imageKitFileId: text("image_kit_file_id"),
   active: boolean("active").notNull().default(true),
+  discountPriceCents: integer("discount_price_cents"),
+  stock: integer("stock").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 

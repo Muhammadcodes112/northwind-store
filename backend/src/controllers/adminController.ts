@@ -27,6 +27,8 @@ const productCreate = z.object({
     .nullable(),
   imageKitFileId: z.union([z.string().min(1), z.literal(""), z.null()]).optional(),
   active: z.boolean().default(true),
+  discountPriceCents: z.union([z.number().int().positive(), z.null()]).optional(),
+  stock: z.number().int().min(0).default(0),
 });
 
 const productPatch = productCreate.partial();
@@ -44,6 +46,8 @@ function buildProductUpdateSet(body: z.infer<typeof productPatch>) {
     data.imageKitFileId = body.imageKitFileId === "" ? null : body.imageKitFileId;
   }
   if (body.active !== undefined) data.active = body.active;
+  if (body.discountPriceCents !== undefined) data.discountPriceCents = body.discountPriceCents;
+  if (body.stock !== undefined) data.stock = body.stock;
   return data;
 }
 

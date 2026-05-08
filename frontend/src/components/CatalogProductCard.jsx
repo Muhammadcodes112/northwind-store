@@ -21,7 +21,7 @@ export function CatalogProductCard({ product }) {
   };
 
   return (
-    <article className="card group h-full overflow-hidden border border-base-300 bg-base-100 shadow-md transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-xl">
+    <article className="card group h-full overflow-hidden border border-base-300 bg-base-100 shadow-md transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out fill-mode-both">
       <Link to={`/product/${product.slug}`} className="relative block overflow-hidden">
         <figure className="aspect-4/3 bg-base-300">
           {product.imageUrl ? (
@@ -49,9 +49,22 @@ export function CatalogProductCard({ product }) {
           {product.description}
         </p>
         <div className="card-actions mt-auto items-center justify-between border-t border-base-200 pt-2 sm:pt-4">
-          <span className="text-sm sm:text-lg font-bold tabular-nums text-base-content">
-            {formatPrice(product.priceCents, product.currency)}
-          </span>
+          <div className="flex flex-col">
+            {product.discountPriceCents ? (
+              <>
+                <span className="text-[10px] sm:text-xs tabular-nums text-base-content/50 line-through">
+                  {formatPrice(product.priceCents, product.currency)}
+                </span>
+                <span className="text-base sm:text-xl font-extrabold tabular-nums text-primary">
+                  {formatPrice(product.discountPriceCents, product.currency)}
+                </span>
+              </>
+            ) : (
+              <span className="text-sm sm:text-lg font-bold tabular-nums text-base-content">
+                {formatPrice(product.priceCents, product.currency)}
+              </span>
+            )}
+          </div>
           <button
             type="button"
             onClick={handleAdd}

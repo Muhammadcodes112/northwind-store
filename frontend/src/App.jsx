@@ -13,6 +13,7 @@ import OrderSummaryPage from "./pages/OrderSummaryPage";
 import AdminProductsPage from "./pages/AdminProductsPage";
 import AdminOrderDetailPage from "./pages/AdminOrderDetailPage";
 import AccountPage from "./pages/AccountPage";
+import NotificationPage from "./pages/NotificationPage";
 
 function App() {
   const { isLoaded, isSignedIn } = useAuth();
@@ -31,6 +32,7 @@ function App() {
         />
         <Route path="/checkout/return" element={<CheckoutReturnPage />} />
         <Route path="/account" element={isSignedIn ? <AccountPage /> : <Navigate to="/" replace />} />
+        <Route path="/notifications" element={isSignedIn ? <NotificationPage /> : <Navigate to="/" replace />} />
 
         <Route path="/demo-sentry" element={<SentryDemoPage />} />
 

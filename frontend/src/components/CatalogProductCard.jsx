@@ -91,21 +91,23 @@ export function CatalogProductCard({ product }) {
               </p>
             )}
           </div>
-          <button
-            type="button"
-            onClick={handleAdd}
-            className="btn btn-primary btn-xs sm:btn-sm gap-1 shadow-sm scale-90 sm:scale-100"
-          >
-            <PlusIcon className="size-3 sm:size-4" aria-hidden />
-            <span>Add</span>
-          </button>
+          
+          <div className="flex items-center gap-[5px]">
+            {product.stock !== undefined && (
+              <span className={`text-[7px] sm:text-[9px] font-black uppercase tracking-tighter opacity-80 ${product.stock > 0 ? 'text-success' : 'text-error'}`}>
+                {product.stock > 0 ? `${product.stock} IN STOCK` : 'OUT OF STOCK'}
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={handleAdd}
+              className="btn btn-primary btn-xs sm:btn-sm gap-1 shadow-sm scale-90 sm:scale-100"
+            >
+              <PlusIcon className="size-3 sm:size-4" aria-hidden />
+              <span>Add</span>
+            </button>
+          </div>
         </div>
-
-        {product.stock !== undefined && (
-          <span className={`absolute bottom-1 right-2 text-[7px] sm:text-[9px] font-black uppercase tracking-tighter opacity-80 ${product.stock > 0 ? 'text-success' : 'text-error'}`}>
-            {product.stock > 0 ? `${product.stock} IN STOCK` : 'OUT OF STOCK'}
-          </span>
-        )}
       </div>
     </article>
   );

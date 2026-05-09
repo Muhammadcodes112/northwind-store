@@ -395,6 +395,14 @@ export async function updateAdminOrderStatus(req: Request, res: Response, next: 
       await reduceStockForOrder(updated.id);
     }
 
+    const { createNotification } = await import("./notificationController");
+    await createNotification(updated.userId, {
+      title: "Order Update",
+      message: `Your order #${updated.id.slice(0, 8)} status has been updated to ${status}.`,
+      type: "order_update",
+      link: `/orders/${updated.id}`,
+    });
+
     res.json({ order: updated });
   } catch (e) {
     next(e);

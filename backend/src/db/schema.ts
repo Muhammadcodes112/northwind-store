@@ -124,3 +124,20 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
   product: one(products, { fields: [reviews.productId], references: [products.id] }),
   user: one(users, { fields: [reviews.userId], references: [users.id] }),
 }));
+
+export const notifications = pgTable("notifications", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  read: boolean("read").notNull().default(false),
+  type: text("type").notNull().default("info"), // info, order_update, etc
+  link: text("link"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, { fields: [notifications.userId], references: [users.id] }),
+}));

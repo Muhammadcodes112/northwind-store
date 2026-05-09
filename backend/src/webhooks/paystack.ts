@@ -90,6 +90,14 @@ export async function paystackWebhookHandler(req: Request, res: Response) {
         const { reduceStockForOrder } = await import("../lib/inventory");
         await reduceStockForOrder(order.id);
 
+        const { createNotification } = await import("../controllers/notificationController");
+        await createNotification(order.userId, {
+          title: "Payment Confirmed",
+          message: `We've received your payment for order #${order.id.slice(0, 8)}.`,
+          type: "payment",
+          link: `/orders/${order.id}`,
+        });
+
         // @ts-ignore
         const { notifyOrderCreated } = await import("../lib/orderNotifications");
         notifyOrderCreated(order.id).catch(console.error);

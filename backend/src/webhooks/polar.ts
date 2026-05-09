@@ -125,8 +125,18 @@ export async function polarWebhookHandler(req: Request, res: Response) {
         if (ok) {
           const { reduceStockForOrder } = await import("../lib/inventory");
           // @ts-ignore (we'll update fulfillCheckoutSession to return the ID or fetch it)
-          const [order] = await db.select({ id: orders.id }).from(orders).where(eq(orders.polarOrderId, polarOrderId)).limit(1);
-          if (order) await reduceStockForOrder(order.id);
+          const [order] = await db.select({ id: orders.id, userId: orders.userId }).from(orders).where(eq(orders.polarOrderId, polarOrderId)).limit(1);
+          if (order) {
+            await reduceStockForOrder(order.id);
+
+            const { createNotification } = await import("../controllers/notificationController");
+            await createNotification(order.userId, {
+              title: "Payment Confirmed",
+              message: `We've received your payment for order #${order.id.slice(0, 8)}.`,
+              type: "payment",
+              link: `/orders/${order.id}`,
+            });
+          }
           
           res.json({ ok: true });
           return;

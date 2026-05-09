@@ -85,19 +85,7 @@ export function imageKitOptimizedUrl(url, opts = {}) {
   try {
     const u = new URL(url);
 
-    if (u.hostname.endsWith("ik.imagekit.io")) {
-      const segments = u.pathname.split("/").filter(Boolean);
-      if (segments.length < 2) return url;
-      const id = segments[0];
-      const rest = segments.slice(1);
-      while (rest.length && rest[0].toLowerCase().startsWith("tr")) {
-        rest.shift();
-      }
-      if (!rest.length) return url;
-      u.pathname = `/${id}/${tr}/${rest.join("/")}`;
-      return u.toString();
-    }
-
+    // Case 1: Custom endpoint (like https://images.mysite.com)
     const endpoint = import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT?.replace(/\/$/, "");
     if (endpoint && url.startsWith(endpoint)) {
       const epUrl = new URL(endpoint);
@@ -110,6 +98,32 @@ export function imageKitOptimizedUrl(url, opts = {}) {
       }
       if (!relSegs.length) return url;
       u.pathname = `${basePath}/${tr}/${relSegs.join("/")}`;
+      return u.toString();
+    }
+
+    // Case 2: Standard ik.imagekit.io URLs
+    if (u.hostname.endsWith("ik.imagekit.io")) {
+      const segments = u.pathname.split("/").filter(Boolean);
+      
+      // If hostname is exactly ik.imagekit.io, the first segment is the ID
+      if (u.hostname === "ik.imagekit.io") {
+        if (segments.length < 2) return url;
+        const id = segments[0];
+        const rest = segments.slice(1);
+        while (rest.length && rest[0].toLowerCase().startsWith("tr")) {
+          rest.shift();
+        }
+        if (!rest.length) return url;
+        u.pathname = `/${id}/${tr}/${rest.join("/")}`;
+      } else {
+        // If it's a subdomain (id.ik.imagekit.io), all segments are the path
+        const rest = segments;
+        while (rest.length && rest[0].toLowerCase().startsWith("tr")) {
+          rest.shift();
+        }
+        if (!rest.length) return url;
+        u.pathname = `/${tr}/${rest.join("/")}`;
+      }
       return u.toString();
     }
 

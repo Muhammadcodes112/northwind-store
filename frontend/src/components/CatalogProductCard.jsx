@@ -23,7 +23,7 @@ export function CatalogProductCard({ product }) {
   return (
     <article className="card group h-full overflow-hidden border border-base-300 bg-base-100 shadow-md transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out fill-mode-both">
       <Link to={`/product/${product.slug}`} className="relative block overflow-hidden">
-        <figure className="aspect-4/3 bg-base-300">
+        <figure className="aspect-[4/3] bg-base-300">
           {product.imageUrl ? (
             <img
               src={imageKitOptimizedUrl(product.imageUrl, IK_PRESETS.catalogCard)}

@@ -390,6 +390,11 @@ export async function updateAdminOrderStatus(req: Request, res: Response, next: 
       return;
     }
 
+    if (status === "paid" || status === "completed") {
+      const { reduceStockForOrder } = await import("../lib/inventory");
+      await reduceStockForOrder(updated.id);
+    }
+
     res.json({ order: updated });
   } catch (e) {
     next(e);

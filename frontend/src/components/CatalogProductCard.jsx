@@ -64,49 +64,48 @@ export function CatalogProductCard({ product }) {
           {product.category ?? "General"}
         </span>
       </Link>
-      <div className="card-body grow gap-2 p-3 sm:gap-3 sm:p-5 text-left">
+      <div className="card-body grow gap-1.5 p-3 sm:gap-2.5 sm:p-5 text-left text-[0.88em] leading-snug relative">
         <Link
           to={`/product/${product.slug}`}
-          className="card-title line-clamp-2 text-sm sm:text-lg transition group-hover:text-primary"
+          className="card-title line-clamp-2 text-[13px] sm:text-[15px] font-bold transition group-hover:text-primary leading-tight"
         >
           {product.name}
         </Link>
-        <p className="line-clamp-2 sm:line-clamp-3 text-[10px] sm:text-xs leading-relaxed text-base-content/70">
+        <p className="line-clamp-2 sm:line-clamp-3 text-[9px] sm:text-[11px] leading-relaxed text-base-content/70">
           {product.description}
         </p>
-        <div className="card-actions mt-auto items-center justify-between border-t border-base-200 pt-2 sm:pt-4">
+        <div className="card-actions mt-auto items-center justify-between border-t border-base-200 pt-2 sm:pt-3">
           <div className="flex flex-col">
             {product.discountPriceCents ? (
               <>
-                <span className="text-[10px] sm:text-xs tabular-nums text-base-content/50 line-through">
+                <span className="text-[9px] sm:text-[10px] tabular-nums text-base-content/50 line-through">
                   {formatPrice(product.priceCents, product.currency)}
                 </span>
-                <span className="text-base sm:text-xl font-extrabold tabular-nums text-primary">
+                <span className="text-[14px] sm:text-[17px] font-extrabold tabular-nums text-primary">
                   {formatPrice(product.discountPriceCents, product.currency)}
                 </span>
               </>
             ) : (
-              <div className="flex items-center justify-between">
-                <p className="text-lg font-bold text-base-content">
-                  {formatPrice(product.priceCents, product.currency)}
-                </p>
-                {product.stock !== undefined && (
-                  <span className={`text-[10px] font-semibold uppercase tracking-tight ${product.stock > 0 ? 'text-success' : 'text-error'}`}>
-                    {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
-                  </span>
-                )}
-              </div>
+              <p className="text-[14px] sm:text-[16px] font-bold text-base-content">
+                {formatPrice(product.priceCents, product.currency)}
+              </p>
             )}
           </div>
           <button
             type="button"
             onClick={handleAdd}
-            className="btn btn-primary btn-xs sm:btn-sm gap-1 shadow"
+            className="btn btn-primary btn-xs sm:btn-sm gap-1 shadow-sm scale-90 sm:scale-100"
           >
             <PlusIcon className="size-3 sm:size-4" aria-hidden />
             <span>Add</span>
           </button>
         </div>
+
+        {product.stock !== undefined && (
+          <span className={`absolute bottom-1 right-2 text-[7px] sm:text-[9px] font-black uppercase tracking-tighter opacity-80 ${product.stock > 0 ? 'text-success' : 'text-error'}`}>
+            {product.stock > 0 ? `${product.stock} IN STOCK` : 'OUT OF STOCK'}
+          </span>
+        )}
       </div>
     </article>
   );

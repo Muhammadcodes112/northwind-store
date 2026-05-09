@@ -43,7 +43,7 @@ export function TextTicker() {
             className={`absolute transition-all duration-700 ease-in-out w-full flex items-center justify-center px-4 ${translateClass}`}
           >
             <div className="flex items-center gap-2">
-              <Icon className="size-4 sm:size-5 text-primary" aria-hidden />
+              <Icon className="size-[18px] sm:size-[22px] text-primary" aria-hidden />
               <span className="text-primary font-medium tracking-wide text-sm sm:text-base capitalize">
                 {item.text}
               </span>

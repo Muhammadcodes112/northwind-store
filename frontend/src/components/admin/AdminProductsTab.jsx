@@ -56,6 +56,7 @@ export function AdminProductsTab({ getToken }) {
                 <th>Category</th>
                 <th>Slug</th>
                 <th>Price</th>
+                <th>Stock</th>
                 <th>Active</th>
                 <th />
               </tr>
@@ -86,6 +87,11 @@ export function AdminProductsTab({ getToken }) {
                   </td>
                   <td className="font-mono text-sm opacity-80">{p.slug}</td>
                   <td>{formatPrice(p.priceCents, p.currency)}</td>
+                  <td>
+                    <span className={`badge badge-sm font-mono ${p.stock <= 0 ? 'badge-error' : 'badge-ghost'}`}>
+                      {p.stock ?? 0}
+                    </span>
+                  </td>
                   <td>
                     {p.active ? (
                       <span className="badge badge-success badge-sm">yes</span>

@@ -64,6 +64,7 @@ export const orders = pgTable("orders", {
   deliveryLocation: text("delivery_location"),
   totalCents: integer("total_cents").notNull().default(0),
   adminNotifiedAt: timestamp("admin_notified_at", { withTimezone: true }),
+  stockReduced: boolean("stock_reduced").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

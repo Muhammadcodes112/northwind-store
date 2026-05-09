@@ -209,10 +209,8 @@ export async function completeOrder(req: Request, res: Response, next: NextFunct
       .where(eq(orders.id, order.id))
       .returning();
 
-    const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
-    for (const item of items) {
-      await db.execute(sql`UPDATE products SET stock = GREATEST(stock - ${item.quantity}, 0) WHERE id = ${item.productId}`);
-    }
+    const { reduceStockForOrder } = await import("../lib/inventory");
+    await reduceStockForOrder(updatedOrder.id);
 
     notifyOrderCompleted(updatedOrder.id).catch(console.error);
 

@@ -6,6 +6,28 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
   const [slug, setSlug] = useState(initial?.slug ?? "");
   const [name, setName] = useState(initial?.name ?? "");
   const [category, setCategory] = useState(initial?.category ?? "General");
+
+  // Helper to generate slug
+  const generateSlug = (text) => {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  };
+
+  // Auto-slug effect
+  const handleNameChange = (newName) => {
+    setName(newName);
+    // Only auto-update slug if we are creating a new product
+    if (!initial) {
+      setSlug(generateSlug(newName));
+    }
+  };
+
+  const categories = initial?.availableCategories ?? [];
+
   const [description, setDescription] = useState(initial?.description ?? "");
   const [priceCents, setPriceCents] = useState(initial ? String(initial.priceCents / 100) : "");
   const [discountPriceCents, setDiscountPriceCents] = useState(initial && initial.discountPriceCents ? String(initial.discountPriceCents / 100) : "");
@@ -94,6 +116,16 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
   return (
     <form className="mt-4 flex flex-col gap-3" onSubmit={handleSubmit}>
       <label className="form-control w-full">
+        <span className="label-text">Name</span>
+        <input
+          className="input input-bordered w-full"
+          value={name}
+          onChange={(e) => handleNameChange(e.target.value)}
+          required
+        />
+      </label>
+
+      <label className="form-control w-full">
         <span className="label-text">Slug</span>
         <input
           className="input input-bordered w-full"
@@ -105,24 +137,20 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
       </label>
 
       <label className="form-control w-full">
-        <span className="label-text">Name</span>
-        <input
-          className="input input-bordered w-full"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-      </label>
-
-      <label className="form-control w-full">
         <span className="label-text">Category</span>
         <input
           className="input input-bordered w-full"
+          list="category-list"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          placeholder="e.g. Audio, Workspace"
+          placeholder="Select or type category..."
           required
         />
+        <datalist id="category-list">
+          {categories.map((cat) => (
+            <option key={cat} value={cat} />
+          ))}
+        </datalist>
       </label>
 
       <label className="form-control w-full">

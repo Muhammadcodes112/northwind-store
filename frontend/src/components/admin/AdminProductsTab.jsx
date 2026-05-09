@@ -17,6 +17,8 @@ export function AdminProductsTab({ getToken }) {
     deleteMutation,
   } = useAdminProductsPage();
 
+  const availableCategories = Array.from(new Set(products.map((p) => p.category).filter(Boolean))).sort();
+
   function handleDeleteProduct(product) {
     if (!window.confirm(`Delete "${product.name}" permanently?`)) return;
     deleteMutation.mutate(product.id);
@@ -132,7 +134,7 @@ export function AdminProductsTab({ getToken }) {
           <h3 className="text-lg font-bold">{editing ? "Edit product" : "New product"}</h3>
           <AdminProductForm
             key={editing?.id ?? "new"}
-            initial={editing}
+            initial={editing ? { ...editing, availableCategories } : { availableCategories }}
             saving={saveMutation.isPending}
             error={saveMutation.isError}
             getToken={getToken}

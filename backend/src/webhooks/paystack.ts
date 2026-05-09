@@ -87,7 +87,10 @@ export async function paystackWebhookHandler(req: Request, res: Response) {
       
       const [order] = await db.select().from(orders).where(eq(orders.paystackReference, data.reference));
       if (order) {
-        // @ts-ignore (dynamic import to avoid circular dependency issues if any, though it's fine here)
+        const { reduceStockForOrder } = await import("../lib/inventory");
+        await reduceStockForOrder(order.id);
+
+        // @ts-ignore
         const { notifyOrderCreated } = await import("../lib/orderNotifications");
         notifyOrderCreated(order.id).catch(console.error);
       }

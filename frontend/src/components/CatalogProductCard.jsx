@@ -7,7 +7,29 @@ import { useCart } from "../store/cart.js";
 import toast from "react-hot-toast";
 
 export function CatalogProductCard({ product }) {
+  const cardRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
   const addItem = useCart((s) => s.addItem);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current);
+    }
+
+    return () => {
+      if (cardRef.current) observer.unobserve(cardRef.current);
+    };
+  }, []);
 
   const handleAdd = () => {
     addItem(product.id);
@@ -21,7 +43,10 @@ export function CatalogProductCard({ product }) {
   };
 
   return (
-    <article className="card group h-full overflow-hidden border border-base-300 bg-base-100 shadow-md transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out fill-mode-both">
+    <article 
+      ref={cardRef}
+      className={`card group h-full overflow-hidden border border-base-300 bg-base-100 shadow-md transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-xl reveal ${isVisible ? "active" : ""} duration-700 ease-out fill-mode-both`}
+    >
       <Link to={`/product/${product.slug}`} className="relative block overflow-hidden">
         <figure className="aspect-[4/3] bg-base-300">
           {product.imageUrl ? (
@@ -60,9 +85,16 @@ export function CatalogProductCard({ product }) {
                 </span>
               </>
             ) : (
-              <span className="text-sm sm:text-lg font-bold tabular-nums text-base-content">
-                {formatPrice(product.priceCents, product.currency)}
-              </span>
+              <div className="flex items-center justify-between">
+                <p className="text-lg font-bold text-base-content">
+                  {formatPrice(product.priceCents, product.currency)}
+                </p>
+                {product.stock !== undefined && (
+                  <span className={`text-[10px] font-semibold uppercase tracking-tight ${product.stock > 0 ? 'text-success' : 'text-error'}`}>
+                    {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                  </span>
+                )}
+              </div>
             )}
           </div>
           <button

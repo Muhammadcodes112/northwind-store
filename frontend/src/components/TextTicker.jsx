@@ -1,11 +1,19 @@
 import { useState, useEffect } from "react";
 
+import { 
+  ShoppingBagIcon, 
+  TruckIcon, 
+  ShieldCheckIcon, 
+  HeadphonesIcon, 
+  SparklesIcon 
+} from "lucide-react";
+
 const TEXTS = [
-  "Welcome to the EmporiumCorner",
-  "Shopping made Easy",
-  "Fast Deliveries",
-  "Quality Products",
-  "Good Customer Support"
+  { text: "Welcome to the EmporiumCorner", icon: SparklesIcon },
+  { text: "Shopping made Easy", icon: ShoppingBagIcon },
+  { text: "Deliveries within 2-3 working days", icon: TruckIcon },
+  { text: "Quality Products", icon: ShieldCheckIcon },
+  { text: "Good Customer Support", icon: HeadphonesIcon }
 ];
 
 export function TextTicker() {
@@ -20,7 +28,8 @@ export function TextTicker() {
 
   return (
     <div className="w-full bg-primary/10 border-y border-primary/20 h-10 sm:h-14 flex items-center justify-center overflow-hidden relative">
-      {TEXTS.map((text, i) => {
+      {TEXTS.map((item, i) => {
+        const Icon = item.icon;
         let translateClass = "-translate-x-full opacity-0";
         if (i === index) {
           translateClass = "translate-x-0 opacity-100";
@@ -30,12 +39,15 @@ export function TextTicker() {
 
         return (
           <div
-            key={text}
-            className={`absolute transition-all duration-700 ease-in-out w-full text-center px-4 ${translateClass}`}
+            key={item.text}
+            className={`absolute transition-all duration-700 ease-in-out w-full flex items-center justify-center px-4 ${translateClass}`}
           >
-            <span className="text-primary font-medium tracking-wide text-sm sm:text-base capitalize">
-              {text}
-            </span>
+            <div className="flex items-center gap-2">
+              <Icon className="size-4 sm:size-5 text-primary" aria-hidden />
+              <span className="text-primary font-medium tracking-wide text-sm sm:text-base capitalize">
+                {item.text}
+              </span>
+            </div>
           </div>
         );
       })}

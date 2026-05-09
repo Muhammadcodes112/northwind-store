@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { PlusIcon } from "lucide-react";
 import { formatPrice } from "../utils/format.js";

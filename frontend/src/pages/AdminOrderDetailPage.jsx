@@ -1,10 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useParams, Link, Navigate } from "react-router";
 import { useAuth } from "@clerk/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../lib/api";
 import { formatPrice } from "../utils/format";
-import { CheckCircleIcon, ClockIcon, PackageIcon } from "lucide-react";
+import { CheckCircleIcon, ClockIcon, PackageIcon, AlertTriangleIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import { IK_PRESETS, imageKitOptimizedUrl } from "../lib/imagekitUrl";
 import { PageError } from "../components/PageError";
@@ -32,6 +32,19 @@ function AdminOrderDetailPage() {
   });
 
   const order = orderData?.order;
+
+  const [confirmDialog, setConfirmDialog] = useState(null);
+
+  const openConfirm = (status) => {
+    setConfirmDialog({
+      status,
+      title: status === "completed" ? "Complete this order?" : "Revert order to pending?",
+      description:
+        status === "completed"
+          ? "This marks the order as fulfilled. This action will also reduce product stock if not already done."
+          : "This reopens the order and moves it back to the pending queue.",
+    });
+  };
 
   const updateStatusMutation = useMutation({
     mutationFn: (status) =>
@@ -190,28 +203,72 @@ function AdminOrderDetailPage() {
             <div className="space-y-2">
               {order.status !== "completed" ? (
                 <button
-                  className="btn btn-success w-full gap-2"
-                  onClick={() => updateStatusMutation.mutate("completed")}
+                  className="btn btn-success w-full gap-2 shadow-sm"
+                  onClick={() => openConfirm("completed")}
                   disabled={updateStatusMutation.isPending}
                 >
-                  <CheckCircleIcon className="size-4" /> Complete
+                  <CheckCircleIcon className="size-4" /> Complete Order
                 </button>
               ) : (
                 <button
-                  className="btn btn-ghost w-full gap-2"
-                  onClick={() => updateStatusMutation.mutate("pending")}
+                  className="btn btn-ghost w-full gap-2 border border-base-300 hover:bg-base-200"
+                  onClick={() => openConfirm("pending")}
                   disabled={updateStatusMutation.isPending}
                 >
-                  <ClockIcon className="size-4" /> Revert
+                  <ClockIcon className="size-4" /> Revert to Pending
                 </button>
               )}
             </div>
           </div>
         </div>
       </div>
+
+      {confirmDialog && (
+        <div className="modal modal-open bg-neutral/60 backdrop-blur-sm transition-all duration-300">
+          <div className="modal-box max-w-md border border-base-300 shadow-2xl scale-in-center">
+            <div className="flex items-center gap-3 mb-4">
+              <div className={`p-3 rounded-full ${confirmDialog.status === 'completed' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>
+                {confirmDialog.status === 'completed' ? <CheckCircleIcon className="size-6" /> : <ClockIcon className="size-6" />}
+              </div>
+              <h3 className="text-xl font-bold">{confirmDialog.title}</h3>
+            </div>
+            
+            <p className="text-base-content/70 leading-relaxed">
+              {confirmDialog.description}
+            </p>
+
+            <div className="mt-6 flex flex-col gap-2 rounded-xl bg-base-200/50 p-4 border border-base-300/50">
+              <div className="flex justify-between text-xs opacity-60 font-mono uppercase tracking-widest">
+                <span>Order Summary</span>
+                <span>ID: {order.id.slice(0, 8)}</span>
+              </div>
+              <div className="font-semibold text-lg">{formatPrice(order.totalCents, "ngn")}</div>
+              <div className="text-sm opacity-80">{order.user?.email}</div>
+            </div>
+
+            <div className="modal-action gap-2">
+              <button 
+                className="btn btn-ghost flex-1" 
+                onClick={() => setConfirmDialog(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className={`btn flex-[1.5] ${confirmDialog.status === "completed" ? "btn-success" : "btn-warning"} shadow-lg`}
+                onClick={() => {
+                  updateStatusMutation.mutate(confirmDialog.status);
+                  setConfirmDialog(null);
+                }}
+              >
+                Confirm {confirmDialog.status === "completed" ? "Completion" : "Reversion"}
+              </button>
+            </div>
+          </div>
+          <div className="modal-backdrop" onClick={() => setConfirmDialog(null)} />
+        </div>
+      )}
     </div>
   );
 }
 
 export default AdminOrderDetailPage;
-

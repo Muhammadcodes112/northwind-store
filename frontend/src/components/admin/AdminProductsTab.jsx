@@ -142,7 +142,7 @@ export function AdminProductsTab({ getToken }) {
             key={editing?.id ?? "new"}
             initial={editing ? { ...editing, availableCategories } : { availableCategories }}
             saving={saveMutation.isPending}
-            error={saveMutation.isError}
+            error={saveMutation.isError ? saveMutation.error?.message : null}
             getToken={getToken}
             onCancel={() => {
               setModalOpen(false);

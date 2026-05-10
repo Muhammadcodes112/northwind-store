@@ -4,8 +4,9 @@ import { getLocalUser } from "../lib/users";
 import { isStaff } from "../lib/roles";
 import { db } from "../db";
 import { orderItems, orders, products } from "../db/schema";
-import { asc, desc, eq, inArray, sql } from "drizzle-orm";
+import { asc, desc, eq, inArray } from "drizzle-orm";
 import { notifyOrderCompleted } from "../lib/orderNotifications";
+import { baseProductColumns, hydrateLegacyImages } from "../lib/productSelect";
 
 export async function listOrders(req: Request, res: Response, next: NextFunction) {
   try {
@@ -105,13 +106,19 @@ export async function getOrder(req: Request, res: Response, next: NextFunction) 
         id: orderItems.id,
         quantity: orderItems.quantity,
         unitPriceCents: orderItems.unitPriceCents,
-        product: products,
+        product: baseProductColumns,
       })
       .from(orderItems)
       .innerJoin(products, eq(orderItems.productId, products.id))
       .where(eq(orderItems.orderId, order.id));
 
-    res.json({ order, items });
+    res.json({
+      order,
+      items: items.map((item) => ({
+        ...item,
+        product: hydrateLegacyImages(item.product),
+      })),
+    });
   } catch (e) {
     next(e);
   }
@@ -209,10 +216,28 @@ export async function completeOrder(req: Request, res: Response, next: NextFunct
       .where(eq(orders.id, order.id))
       .returning();
 
-    const { reduceStockForOrder } = await import("../lib/inventory");
+    const { reduceStockForOrder } = await import("../lib/inventory.js");
     await reduceStockForOrder(updatedOrder.id);
 
     notifyOrderCompleted(updatedOrder.id).catch(console.error);
+
+    const itemRows = await db
+      .select({
+        name: products.name,
+        quantity: orderItems.quantity,
+      })
+      .from(orderItems)
+      .innerJoin(products, eq(orderItems.productId, products.id))
+      .where(eq(orderItems.orderId, updatedOrder.id));
+
+    const itemDetails = itemRows.map(i => `${i.quantity}x ${i.name}`).join(", ");
+    const { createNotification } = await import("./notificationController.js");
+    await createNotification(updatedOrder.userId, {
+      title: "Order Completed",
+      message: `Your order #${updatedOrder.id.slice(0, 8)} containing ${itemDetails || 'items'} has been successfully completed.`,
+      type: "order_update",
+      link: `/orders/${updatedOrder.id}`,
+    });
 
     res.json({ order: updatedOrder });
   } catch (e) {

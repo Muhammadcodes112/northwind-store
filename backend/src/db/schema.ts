@@ -33,6 +33,8 @@ export const products = pgTable("products", {
   imageUrl: text("image_url"),
   /** ImageKit `fileId` for deletes */
   imageKitFileId: text("image_kit_file_id"),
+  imageUrls: jsonb("image_urls").$type<string[]>().notNull().default([]),
+  imageKitFileIds: jsonb("image_kit_file_ids").$type<string[]>().notNull().default([]),
   active: boolean("active").notNull().default(true),
   discountPriceCents: integer("discount_price_cents"),
   stock: integer("stock").notNull().default(0),

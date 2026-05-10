@@ -2,9 +2,10 @@ import type { Request, Response, NextFunction } from "express";
 import { getAuth } from "@clerk/express";
 import { getLocalUser } from "../lib/users";
 import { db } from "../db";
-import { reviews, products } from "../db/schema";
+import { reviews } from "../db/schema";
 import { desc, eq, and } from "drizzle-orm";
 import { z } from "zod";
+import { selectProductBySlugWithImageFallback } from "../lib/productSelect";
 
 const createReviewSchema = z.object({
   rating: z.number().int().min(1).max(5),
@@ -15,7 +16,7 @@ export async function listProductReviews(req: Request, res: Response, next: Next
   try {
     const slug = req.params.slug as string;
 
-    const [product] = await db.select().from(products).where(eq(products.slug, slug)).limit(1);
+    const product = await selectProductBySlugWithImageFallback(slug);
     if (!product) {
       res.status(404).json({ error: "Product not found" });
       return;
@@ -50,7 +51,7 @@ export async function createProductReview(req: Request, res: Response, next: Nex
     }
 
     const slug = req.params.slug as string;
-    const [product] = await db.select().from(products).where(eq(products.slug, slug)).limit(1);
+    const product = await selectProductBySlugWithImageFallback(slug);
     if (!product) {
       res.status(404).json({ error: "Product not found" });
       return;

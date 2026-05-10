@@ -6,6 +6,30 @@ import { db } from "../db";
 import { users } from "../db/schema";
 import { eq } from "drizzle-orm";
 
+async function sendWelcomeEmail(email: string | undefined, displayName: string | null) {
+  const resendKey = process.env.RESEND_API_KEY;
+  if (!resendKey || !email) return;
+
+  // @ts-ignore
+  const { Resend } = await import("resend");
+  const resend = new Resend(resendKey);
+
+  await resend.emails.send({
+    from: "The Emporium Corner <onboarding@resend.dev>",
+    to: [email],
+    subject: "Welcome to The Emporium Corner",
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; color: #222;">
+        <h2 style="color: #c0994f;">Welcome to The Emporium Corner</h2>
+        <p>Hello ${displayName || "there"},</p>
+        <p>Thank you for registering with The Emporium Corner. You are now part of the family.</p>
+        <p>We are happy to have you here and cannot wait to help you discover products you love.</p>
+        <p style="margin-top: 24px;">Warmly,<br/>The Emporium Corner Team</p>
+      </div>
+    `,
+  }).catch(console.error);
+}
+
 export async function clerkWebhookHandler(req: Request, res: Response) {
   const env = getEnv();
 
@@ -52,6 +76,10 @@ export async function clerkWebhookHandler(req: Request, res: Response) {
           target: users.clerkUserId,
           set: { email, displayName, role, updatedAt: new Date() },
         });
+
+      if (evt.type === "user.created") {
+        await sendWelcomeEmail(email, displayName);
+      }
     }
 
     if (evt.type === "user.deleted") {

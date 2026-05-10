@@ -43,6 +43,9 @@ export function useAdminProductsPage() {
       setModalOpen(false);
       setEditing(null);
     },
+    onError: (err) => {
+      console.log(err);
+    },
   });
 
   const deleteMutation = useMutation({

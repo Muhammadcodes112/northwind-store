@@ -2,8 +2,12 @@ import Footer from "./Footer";
 import Navbar from "./Navbar";
 import { MobileBottomNav } from "./MobileBottomNav";
 import { FloatingSupportButton } from "./FloatingSupportButton";
+import { useLocation } from "react-router";
 
 function Layout({ children }) {
+  const location = useLocation();
+  const showFooter = location.pathname === "/";
+
   return (
     <div className="flex min-h-svh flex-col bg-base-200 text-base-content">
       <Navbar />
@@ -13,7 +17,7 @@ function Layout({ children }) {
         {children}
       </main>
 
-      <Footer />
+      {showFooter ? <Footer /> : null}
       <MobileBottomNav />
       <FloatingSupportButton phoneNumber="2348133180063" />
     </div>

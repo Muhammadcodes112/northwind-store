@@ -1,7 +1,11 @@
 import type { Request, Response, NextFunction } from "express";
 import { db } from "../db";
 import { products } from "../db/schema";
-import { and, desc, eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import {
+  selectProductBySlugWithImageFallback,
+  selectProductsWithImageFallback,
+} from "../lib/productSelect";
 
 export async function listProducts(req: Request, res: Response, next: NextFunction) {
   try {
@@ -10,11 +14,7 @@ export async function listProducts(req: Request, res: Response, next: NextFuncti
     const activeOnly = eq(products.active, true);
     const whereClause = cat ? and(activeOnly, eq(products.category, cat)) : activeOnly;
 
-    const rows = await db
-      .select()
-      .from(products)
-      .where(whereClause)
-      .orderBy(desc(products.createdAt));
+    const rows = await selectProductsWithImageFallback(whereClause);
 
     res.json({ products: rows });
   } catch (e) {
@@ -39,11 +39,7 @@ export async function getCategories(_req: Request, res: Response, next: NextFunc
 
 export async function getProductBySlug(req: Request, res: Response, next: NextFunction) {
   try {
-    const [row] = await db
-      .select()
-      .from(products)
-      .where(eq(products.slug, req.params.slug as string))
-      .limit(1);
+    const row = await selectProductBySlugWithImageFallback(req.params.slug as string);
 
     if (!row || !row.active) return res.status(404).json({ error: "Not found" });
 

@@ -76,9 +76,6 @@ export async function sendPendingOrderAdminReminders() {
 }
 
 export async function notifyOrderCreated(orderId: string) {
-  const resendKey = process.env.RESEND_API_KEY;
-  if (!resendKey) return;
-
   const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
   if (!order) return;
 
@@ -86,8 +83,7 @@ export async function notifyOrderCreated(orderId: string) {
   if (!user) return;
 
   const adminUsers = await db.select().from(users).where(eq(users.role, "admin"));
-  const adminEmails = adminUsers.map((u) => u.email).filter(Boolean);
-  if (adminEmails.length === 0) return;
+  if (adminUsers.length === 0) return;
 
   const itemRows = await db
     .select({
@@ -105,6 +101,24 @@ export async function notifyOrderCreated(orderId: string) {
         `<li>${item.name} - Qty: ${item.quantity} - Price: ${currencyFromCents(item.unitPriceCents * item.quantity)}</li>`,
     )
     .join("");
+
+  const itemDetails = itemRows.map(i => `${i.quantity}x ${i.name}`).join(", ");
+  const { createNotification } = await import("../controllers/notificationController.js");
+  
+  for (const admin of adminUsers) {
+    await createNotification(admin.id, {
+      title: "New Order Alert",
+      message: `A new order (#${order.id.slice(0, 8)}) was just placed by ${user.displayName || user.email || 'a customer'} containing ${itemDetails || 'items'}.`,
+      type: "new_order",
+      link: `/admin/orders/${order.id}`,
+    });
+  }
+
+  const resendKey = process.env.RESEND_API_KEY;
+  if (!resendKey) return;
+
+  const adminEmails = adminUsers.map((u) => u.email).filter(Boolean);
+  if (adminEmails.length === 0) return;
 
   // @ts-ignore
   const { Resend } = await import("resend");

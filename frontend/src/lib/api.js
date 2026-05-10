@@ -51,6 +51,13 @@ export async function apiFetch(path, opts = {}) {
 
   if (!res.ok) {
     let msg = typeof data?.error === "string" ? data.error : res.statusText;
+    const fieldErrors = data?.details?.fieldErrors;
+    if (fieldErrors && typeof fieldErrors === "object") {
+      const firstField = Object.keys(fieldErrors).find((key) => fieldErrors[key]?.length);
+      if (firstField) {
+        msg = `${msg}: ${firstField} ${fieldErrors[firstField][0]}`;
+      }
+    }
     if (!isJson) {
       msg = "Unexpected non-JSON response from server";
     }

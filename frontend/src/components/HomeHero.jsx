@@ -68,7 +68,7 @@ export function HomeHero({ products, loading }) {
               <h2 className="text-xl sm:text-3xl md:text-5xl font-extrabold text-black mb-1 md:mb-3 line-clamp-2 leading-tight">
                 {product.name}
               </h2>
-              <p className="text-xs sm:text-sm md:text-lg text-black/80 mb-3 sm:mb-4 md:mb-6 line-clamp-1">
+              <p className="text-[9.6px] sm:text-[11.2px] md:text-[14.4px] text-black/80 mb-3 sm:mb-4 md:mb-6 line-clamp-1">
                 {product.category}
               </p>
               <div>

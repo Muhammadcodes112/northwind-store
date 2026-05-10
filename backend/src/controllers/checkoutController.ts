@@ -8,6 +8,7 @@ import { CheckoutSessionLine, checkoutSessions, products } from "../db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import { paystackInitializeCheckout } from "../lib/paystack";
 import { notifyOrderCreated } from "../lib/orderNotifications";
+import { selectProductsWithImageFallback } from "../lib/productSelect";
 
 const env = getEnv();
 
@@ -54,10 +55,9 @@ export async function createCheckout(req: Request, res: Response, next: NextFunc
     const ids = parsed.data.items.map((i) => i.productId);
 
     // load every cart product that exists, is active, and matches the IDs we asked for.
-    const prodRows = await db
-      .select()
-      .from(products)
-      .where(and(inArray(products.id, ids), eq(products.active, true)));
+    const prodRows = await selectProductsWithImageFallback(
+      and(inArray(products.id, ids), eq(products.active, true)),
+    );
 
     if (prodRows.length !== ids.length) {
       res.status(400).json({ error: "One or more products are invalid" });

@@ -3,10 +3,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../lib/api";
 import { BellIcon, CheckCheckIcon, InboxIcon, Trash2Icon } from "lucide-react";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
 
 function NotificationPage() {
   const { getToken, isSignedIn } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { data, isLoading } = useQuery({
     queryKey: ["notifications"],
@@ -80,7 +82,10 @@ function NotificationPage() {
           notifications.map((n) => (
             <div
               key={n.id}
-              onClick={() => !n.read && markReadMutation.mutate(n.id)}
+              onClick={() => {
+                if (!n.read) markReadMutation.mutate(n.id);
+                if (n.link) navigate(n.link);
+              }}
               className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer ${
                 n.read
                   ? "bg-base-100 border-base-200 opacity-70"

@@ -3,6 +3,7 @@ import { uploadImageToImageKit } from "../lib/imagekitUpload.js";
 import { IK_PRESETS, imageKitOptimizedUrl } from "../lib/imagekitUrl.js";
 
 export function AdminProductForm({ initial, saving, error, getToken, onCancel, onSubmit }) {
+  const isEditing = Boolean(initial?.id);
   const [slug, setSlug] = useState(initial?.slug ?? "");
   const [name, setName] = useState(initial?.name ?? "");
   const [category, setCategory] = useState(initial?.category ?? "General");
@@ -20,8 +21,7 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
   // Auto-slug effect
   const handleNameChange = (newName) => {
     setName(newName);
-    // Only auto-update slug if we are creating a new product
-    if (!initial) {
+    if (!isEditing) {
       setSlug(generateSlug(newName));
     }
   };
@@ -29,12 +29,16 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
   const categories = initial?.availableCategories ?? [];
 
   const [description, setDescription] = useState(initial?.description ?? "");
-  const [priceCents, setPriceCents] = useState(initial ? String(initial.priceCents / 100) : "");
-  const [discountPriceCents, setDiscountPriceCents] = useState(initial && initial.discountPriceCents ? String(initial.discountPriceCents / 100) : "");
-  const [stock, setStock] = useState(initial ? String(initial.stock ?? 0) : "0");
-  const [currency, setCurrency] = useState(initial?.currency ?? "ngn");
-  const [imageUrl, setImageUrl] = useState(initial?.imageUrl ?? "");
-  const [imageKitFileId, setImageKitFileId] = useState(initial?.imageKitFileId ?? "");
+  const [priceCents, setPriceCents] = useState(isEditing ? String(initial.priceCents / 100) : "");
+  const [discountPriceCents, setDiscountPriceCents] = useState(isEditing && initial.discountPriceCents ? String(initial.discountPriceCents / 100) : "");
+  const [stock, setStock] = useState(isEditing ? String(initial.stock ?? 0) : "0");
+  const [images, setImages] = useState(() => {
+    const urls = [initial?.imageUrl, ...(Array.isArray(initial?.imageUrls) ? initial.imageUrls : [])]
+      .filter(Boolean);
+    const uniqueUrls = Array.from(new Set(urls)).slice(0, 5);
+    const fileIds = [initial?.imageKitFileId, ...(Array.isArray(initial?.imageKitFileIds) ? initial.imageKitFileIds : [])];
+    return uniqueUrls.map((url, index) => ({ url, fileId: fileIds[index] ?? "" }));
+  });
   const [active, setActive] = useState(initial?.active ?? true);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState(null);
@@ -50,24 +54,31 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
       category: category.trim() || "General",
       description: description.trim(),
       priceCents: Math.round(dollars * 100),
-      currency: currency.trim().toLowerCase(),
-      imageUrl: imageUrl.trim() || null,
-      imageKitFileId: imageKitFileId.trim() || null,
+      currency: "ngn",
+      imageUrl: images[0]?.url?.trim() || null,
+      imageKitFileId: images[0]?.fileId?.trim() || null,
+      imageUrls: images.map((image) => image.url.trim()).filter(Boolean).slice(0, 5),
+      imageKitFileIds: images.map((image) => image.fileId?.trim()).filter(Boolean).slice(0, 5),
       active,
       discountPriceCents: discountPriceCents ? Math.round(Number.parseFloat(discountPriceCents) * 100) : null,
       stock: Number.parseInt(stock, 10) || 0,
     };
 
-    if (initial) {
+    if (isEditing) {
       const patch = {};
       if (body.name !== initial.name) patch.name = body.name;
       if (body.category !== (initial.category ?? "General")) patch.category = body.category;
       if (body.description !== initial.description) patch.description = body.description;
       if (body.priceCents !== initial.priceCents) patch.priceCents = body.priceCents;
-      if (body.currency !== initial.currency) patch.currency = body.currency;
       if ((body.imageUrl ?? "") !== (initial.imageUrl ?? "")) patch.imageUrl = body.imageUrl;
+      if (JSON.stringify(body.imageUrls) !== JSON.stringify(initial.imageUrls ?? [])) {
+        patch.imageUrls = body.imageUrls;
+      }
       if ((body.imageKitFileId ?? null) !== (initial.imageKitFileId ?? null)) {
         patch.imageKitFileId = body.imageKitFileId;
+      }
+      if (JSON.stringify(body.imageKitFileIds) !== JSON.stringify(initial.imageKitFileIds ?? [])) {
+        patch.imageKitFileIds = body.imageKitFileIds;
       }
       if (body.active !== initial.active) patch.active = body.active;
       if (body.discountPriceCents !== (initial.discountPriceCents ?? null)) patch.discountPriceCents = body.discountPriceCents;
@@ -89,6 +100,11 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
 
     setUploadError(null);
 
+    if (images.length >= 5) {
+      setUploadError("You can add up to 5 images per product.");
+      return;
+    }
+
     if (file.size > 10 * 1024 * 1024) {
       setUploadError("File is too large (max 10MB).");
       return;
@@ -104,8 +120,7 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
         fileName: `${base}-${Date.now()}${ext}`,
       });
 
-      setImageUrl(url);
-      setImageKitFileId(fileId ?? "");
+      setImages((current) => [...current, { url, fileId: fileId ?? "" }].slice(0, 5));
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Upload failed");
     } finally {
@@ -113,8 +128,26 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
     }
   }
 
+  function updateImageUrl(index, url) {
+    setImages((current) =>
+      current.map((image, i) => (i === index ? { ...image, url, fileId: url === image.url ? image.fileId : "" } : image)),
+    );
+  }
+
+  function removeImage(index) {
+    setImages((current) => current.filter((_, i) => i !== index));
+  }
+
+  function addImageField() {
+    if (images.length >= 5) {
+      setUploadError("You can add up to 5 images per product.");
+      return;
+    }
+    setImages((current) => [...current, { url: "", fileId: "" }]);
+  }
+
   return (
-    <form className="mt-4 flex flex-col gap-3" onSubmit={handleSubmit}>
+    <form className="mt-4 flex flex-col gap-3 text-[90%]" onSubmit={handleSubmit}>
       <label className="form-control w-full">
         <span className="label-text">Name</span>
         <input
@@ -132,7 +165,7 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
           value={slug}
           onChange={(e) => setSlug(e.target.value)}
           required
-          disabled={Boolean(initial)}
+          disabled={isEditing}
         />
       </label>
 
@@ -198,20 +231,10 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
             onChange={(e) => setStock(e.target.value)}
           />
         </label>
-
-        <label className="form-control">
-          <span className="label-text">Currency</span>
-          <input
-            className="input input-bordered"
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-            required
-          />
-        </label>
       </div>
 
       <div className="form-control w-full">
-        <span className="label-text">Image</span>
+        <span className="label-text">Images ({images.length}/5)</span>
         <label className="mb-2 flex cursor-pointer flex-wrap items-center gap-2">
           <span className="btn btn-secondary btn-sm shrink-0">
             {uploadingImage ? (
@@ -227,7 +250,7 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
             type="file"
             accept="image/png,image/jpeg,image/webp,image/gif"
             className="hidden"
-            disabled={uploadingImage || saving}
+            disabled={uploadingImage || saving || images.length >= 5}
             onChange={handleImageUpload}
           />
         </label>
@@ -236,31 +259,45 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
           <span className="label-text-alt text-base-content/60">Image URL (any HTTPS URL)</span>
         </label>
 
-        <input
-          className="input input-bordered w-full"
-          type="url"
-          value={imageUrl}
-          onChange={(e) => {
-            const v = e.target.value;
-            if (v !== imageUrl) setImageKitFileId("");
-            setImageUrl(v);
-          }}
-          placeholder="https://..."
-        />
+        <div className="space-y-2">
+          {images.map((image, index) => (
+            <div key={index} className="flex gap-2">
+              <input
+                className="input input-bordered w-full"
+                type="url"
+                value={image.url}
+                onChange={(e) => updateImageUrl(index, e.target.value)}
+                placeholder="https://..."
+              />
+              <button type="button" className="btn btn-ghost btn-sm text-error" onClick={() => removeImage(index)}>
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {images.length < 5 ? (
+          <button type="button" className="btn btn-ghost btn-sm mt-2 w-fit" onClick={addImageField}>
+            Add image URL
+          </button>
+        ) : null}
 
         {uploadError ? (
           <span className="mt-1 text-xs text-error" role="alert">
             {uploadError}
           </span>
         ) : null}
-        {imageUrl ? (
-          <div className="mt-2 overflow-hidden rounded-lg border border-base-300 bg-base-200 p-2">
-            <img
-              src={imageKitOptimizedUrl(imageUrl, IK_PRESETS.formPreview)}
-              alt=""
-              className="mx-auto max-h-32 w-auto object-contain"
-              decoding="async"
-            />
+        {images.some((image) => image.url) ? (
+          <div className="mt-2 grid grid-cols-2 gap-2 overflow-hidden rounded-lg border border-base-300 bg-base-200 p-2 sm:grid-cols-5">
+            {images.filter((image) => image.url).map((image, index) => (
+              <img
+                key={`${image.url}-${index}`}
+                src={imageKitOptimizedUrl(image.url, IK_PRESETS.formPreview)}
+                alt=""
+                className="mx-auto aspect-square max-h-24 w-full rounded-md object-cover"
+                decoding="async"
+              />
+            ))}
           </div>
         ) : null}
       </div>
@@ -277,7 +314,7 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
 
       {error ? (
         <div role="alert" className="alert alert-error text-sm">
-          Save failed (check slug unique &amp; fields).
+          {typeof error === "string" ? error : "Save failed. Check the product fields and try again."}
         </div>
       ) : null}
 

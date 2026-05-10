@@ -87,10 +87,10 @@ export async function paystackWebhookHandler(req: Request, res: Response) {
       
       const [order] = await db.select().from(orders).where(eq(orders.paystackReference, data.reference));
       if (order) {
-        const { reduceStockForOrder } = await import("../lib/inventory");
+        const { reduceStockForOrder } = await import("../lib/inventory.js");
         await reduceStockForOrder(order.id);
 
-        const { createNotification } = await import("../controllers/notificationController");
+        const { createNotification } = await import("../controllers/notificationController.js");
         await createNotification(order.userId, {
           title: "Payment Confirmed",
           message: `We've received your payment for order #${order.id.slice(0, 8)}.`,

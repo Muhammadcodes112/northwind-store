@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
-import { PlusIcon } from "lucide-react";
+import { HeartIcon, PlusIcon } from "lucide-react";
 import { formatPrice } from "../utils/format.js";
 import { IK_PRESETS, imageKitOptimizedUrl } from "../lib/imagekitUrl.js";
 import { useCart } from "../store/cart.js";
+import { useFavorites } from "../store/favorites.js";
 
 import toast from "react-hot-toast";
 
@@ -11,6 +12,8 @@ export function CatalogProductCard({ product }) {
   const cardRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
   const addItem = useCart((s) => s.addItem);
+  const isFavorite = useFavorites((s) => s.isFavorite);
+  const toggleFavorite = useFavorites((s) => s.toggleFavorite);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -43,6 +46,19 @@ export function CatalogProductCard({ product }) {
     });
   };
 
+  const handleFavorite = () => {
+    const added = toggleFavorite(product.id);
+    toast.success(added ? "Product added to favorites" : "Product removed from favorites", {
+      style: {
+        borderRadius: '10px',
+        background: '#333',
+        color: '#fff',
+      },
+    });
+  };
+
+  const favorite = isFavorite(product.id);
+
   return (
     <article 
       ref={cardRef}
@@ -65,6 +81,20 @@ export function CatalogProductCard({ product }) {
         </span>
       </Link>
       <div className="card-body grow gap-1.5 p-3 sm:gap-2.5 sm:p-5 text-left text-[0.88em] leading-snug relative">
+        <div className="flex items-center justify-between gap-2">
+          <span className="truncate font-mono text-[8px] sm:text-[9px] text-base-content/45">
+            {product.slug}
+          </span>
+          <button
+            type="button"
+            onClick={handleFavorite}
+            className={`btn btn-ghost btn-circle btn-xs shrink-0 ${favorite ? "text-primary" : "text-base-content/55"}`}
+            aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+            title={favorite ? "Remove from favorites" : "Add to favorites"}
+          >
+            <HeartIcon className={`size-3.5 ${favorite ? "fill-primary" : ""}`} aria-hidden />
+          </button>
+        </div>
         <Link
           to={`/product/${product.slug}`}
           className="card-title line-clamp-2 text-[13px] sm:text-[15px] font-bold transition group-hover:text-primary leading-tight"
@@ -91,23 +121,20 @@ export function CatalogProductCard({ product }) {
               </p>
             )}
           </div>
-          
-          <div className="flex items-center gap-[5px]">
-            {product.stock !== undefined && (
-              <span className={`text-[7px] sm:text-[9px] font-black uppercase tracking-tighter opacity-80 ${product.stock > 0 ? 'text-success' : 'text-error'}`}>
-                {product.stock > 0 ? `${product.stock} IN STOCK` : 'OUT OF STOCK'}
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={handleAdd}
-              className="btn btn-primary btn-xs sm:btn-sm gap-1 shadow-sm scale-90 sm:scale-100"
-            >
-              <PlusIcon className="size-3 sm:size-4" aria-hidden />
-              <span>Add</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={handleAdd}
+            className="btn btn-primary btn-xs sm:btn-sm gap-1 shadow-sm scale-90 sm:scale-100 ml-auto"
+          >
+            <PlusIcon className="size-3 sm:size-4" aria-hidden />
+            <span>Add</span>
+          </button>
         </div>
+        {product.stock !== undefined && (
+          <span className={`absolute bottom-1 right-2 translate-y-[5px] text-[7px] sm:text-[9px] font-black uppercase tracking-tighter opacity-80 ${product.stock > 0 ? 'text-success' : 'text-error'}`}>
+            {product.stock > 0 ? `${product.stock} IN STOCK` : 'OUT OF STOCK'}
+          </span>
+        )}
       </div>
     </article>
   );

@@ -11,8 +11,19 @@ import { z } from "zod";
 import { clerkClient } from "@clerk/express";
 import { deleteImageKitAsset } from "../lib/imagekit";
 import { users } from "../db/schema";
+import {
+  insertProductWithImageFallback,
+  selectProductByIdWithImageFallback,
+  selectProductsWithImageFallback,
+  updateProductWithImageFallback,
+} from "../lib/productSelect";
 
 const env = getEnv();
+
+const trimmedUrl = z.preprocess(
+  (value) => (typeof value === "string" ? value.trim() : value),
+  z.string().url(),
+);
 
 const productCreate = z.object({
   slug: z.string().min(1),
@@ -22,10 +33,12 @@ const productCreate = z.object({
   priceCents: z.number().int().positive(),
   currency: z.string().min(1).default("usd"),
   imageUrl: z
-    .union([z.string().url(), z.literal("")])
+    .union([trimmedUrl, z.literal("")])
     .optional()
     .nullable(),
   imageKitFileId: z.union([z.string().min(1), z.literal(""), z.null()]).optional(),
+  imageUrls: z.array(trimmedUrl).max(5).default([]),
+  imageKitFileIds: z.array(z.string().min(1)).max(5).default([]),
   active: z.boolean().default(true),
   discountPriceCents: z.union([z.number().int().positive(), z.null()]).optional(),
   stock: z.number().int().min(0).default(0),
@@ -45,6 +58,8 @@ function buildProductUpdateSet(body: z.infer<typeof productPatch>) {
   if (body.imageKitFileId !== undefined) {
     data.imageKitFileId = body.imageKitFileId === "" ? null : body.imageKitFileId;
   }
+  if (body.imageUrls !== undefined) data.imageUrls = body.imageUrls.slice(0, 5);
+  if (body.imageKitFileIds !== undefined) data.imageKitFileIds = body.imageKitFileIds.slice(0, 5);
   if (body.active !== undefined) data.active = body.active;
   if (body.discountPriceCents !== undefined) data.discountPriceCents = body.discountPriceCents;
   if (body.stock !== undefined) data.stock = body.stock;
@@ -114,7 +129,7 @@ export function getImageKitAuth(_req: Request, res: Response, next: NextFunction
 
 export async function listAdminProducts(_req: Request, res: Response, next: NextFunction) {
   try {
-    const rows = await db.select().from(products).orderBy(desc(products.createdAt));
+    const rows = await selectProductsWithImageFallback();
     res.json({ products: rows });
   } catch (e) {
     next(e);
@@ -128,16 +143,17 @@ export async function createAdminProduct(req: Request, res: Response, next: Next
       res.status(400).json({ error: "Invalid body", details: parsed.error.flatten() });
       return;
     }
-    const { imageUrl, imageKitFileId, ...rest } = parsed.data;
+    const { imageUrl, imageKitFileId, imageUrls, imageKitFileIds, ...rest } = parsed.data;
+    const urls = Array.from(new Set([imageUrl, ...imageUrls].filter(Boolean))).slice(0, 5) as string[];
+    const fileIds = Array.from(new Set([imageKitFileId, ...imageKitFileIds].filter(Boolean))).slice(0, 5) as string[];
 
-    const [row] = await db
-      .insert(products)
-      .values({
-        ...rest,
-        imageUrl: imageUrl || null,
-        imageKitFileId: imageKitFileId || null,
-      })
-      .returning();
+    const row = await insertProductWithImageFallback({
+      ...rest,
+      imageUrl: urls[0] || null,
+      imageKitFileId: fileIds[0] || null,
+      imageUrls: urls,
+      imageKitFileIds: fileIds,
+    });
     res.status(201).json({ product: row });
   } catch (e) {
     next(e);
@@ -159,11 +175,7 @@ export async function updateAdminProduct(req: Request, res: Response, next: Next
       return;
     }
 
-    const [row] = await db
-      .update(products)
-      .set(data)
-      .where(eq(products.id, req.params.id as string))
-      .returning();
+    const row = await updateProductWithImageFallback(req.params.id as string, data);
 
     if (!row) {
       res.status(404).json({ error: "Not found" });
@@ -179,7 +191,7 @@ export async function updateAdminProduct(req: Request, res: Response, next: Next
 export async function deleteAdminProduct(req: Request, res: Response, next: NextFunction) {
   try {
     const id = req.params.id as string;
-    const [existing] = await db.select().from(products).where(eq(products.id, id)).limit(1);
+    const existing = await selectProductByIdWithImageFallback(id);
     if (!existing) {
       res.status(404).json({ error: "Not found" });
       return;
@@ -198,7 +210,12 @@ export async function deleteAdminProduct(req: Request, res: Response, next: Next
       return;
     }
 
-    await deleteImageKitAsset(env, existing.imageKitFileId);
+    const imageKitFileIds = Array.from(
+      new Set([existing.imageKitFileId, ...(existing.imageKitFileIds ?? [])].filter(Boolean)),
+    );
+    for (const fileId of imageKitFileIds) {
+      await deleteImageKitAsset(env, fileId);
+    }
     await db.delete(products).where(eq(products.id, id));
 
     res.json({ ok: true });
@@ -301,18 +318,21 @@ export async function removeAdmin(req: Request, res: Response, next: NextFunctio
 
 export async function listAdminOrders(_req: Request, res: Response, next: NextFunction) {
   try {
-    const rows = await db.query.orders.findMany({
-      orderBy: [desc(orders.createdAt)],
-      with: {
-        user: true,
-        items: {
-          with: {
-            product: true,
-          },
-        },
-      },
+    const rows = await db
+      .select({
+        order: orders,
+        user: users,
+      })
+      .from(orders)
+      .leftJoin(users, eq(orders.userId, users.id))
+      .orderBy(desc(orders.createdAt));
+
+    res.json({
+      orders: rows.map((row) => ({
+        ...row.order,
+        user: row.user,
+      })),
     });
-    res.json({ orders: rows });
   } catch (e) {
     next(e);
   }
@@ -391,14 +411,25 @@ export async function updateAdminOrderStatus(req: Request, res: Response, next: 
     }
 
     if (status === "paid" || status === "completed") {
-      const { reduceStockForOrder } = await import("../lib/inventory");
+      const { reduceStockForOrder } = await import("../lib/inventory.js");
       await reduceStockForOrder(updated.id);
     }
 
-    const { createNotification } = await import("./notificationController");
+    const itemRows = await db
+      .select({
+        name: products.name,
+        quantity: orderItems.quantity,
+      })
+      .from(orderItems)
+      .innerJoin(products, eq(orderItems.productId, products.id))
+      .where(eq(orderItems.orderId, updated.id));
+
+    const itemDetails = itemRows.map(i => `${i.quantity}x ${i.name}`).join(", ");
+
+    const { createNotification } = await import("./notificationController.js");
     await createNotification(updated.userId, {
       title: "Order Update",
-      message: `Your order #${updated.id.slice(0, 8)} status has been updated to ${status}.`,
+      message: `Your order #${updated.id.slice(0, 8)} containing ${itemDetails || 'items'} status has been updated to ${status}.`,
       type: "order_update",
       link: `/orders/${updated.id}`,
     });

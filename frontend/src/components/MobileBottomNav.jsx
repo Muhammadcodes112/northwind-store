@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router";
 import { useAuth, UserButton, SignInButton } from "@clerk/react";
-import { HomeIcon, PackageIcon, ShoppingCartIcon, UserIcon, MoonIcon, SunIcon } from "lucide-react";
+import { HeartIcon, HomeIcon, PackageIcon, ShoppingCartIcon, UserIcon, MoonIcon } from "lucide-react";
 import { useCart } from "../store/cart";
 
 export function MobileBottomNav() {
@@ -36,6 +36,11 @@ export function MobileBottomNav() {
           )}
         </div>
         <span className="text-[10px] font-medium">Cart</span>
+      </Link>
+
+      <Link to="/favorites" className={`flex flex-col items-center justify-center gap-1 w-full h-full pb-1 ${isActive("/favorites") ? "text-primary" : "text-base-content/70"}`}>
+        <HeartIcon className={`size-6 ${isActive("/favorites") ? "fill-primary" : ""}`} />
+        <span className="text-[10px] font-medium">Favorites</span>
       </Link>
       
       <div className="flex flex-col items-center justify-center gap-1 w-full h-full pb-1 text-base-content/70">

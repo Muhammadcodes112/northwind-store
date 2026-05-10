@@ -1,3 +1,6 @@
+
+
+
 import { Show, SignInButton, useAuth, UserButton } from "@clerk/react";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "../lib/api";
@@ -6,6 +9,7 @@ import { useEffect, useState } from "react";
 
 import {
   LogInIcon,
+  HeartIcon,
   PackageIcon,
   SettingsIcon,
   ShoppingBagIcon,
@@ -105,7 +109,7 @@ const MobileSearchModal = ({ isOpen, onClose }) => {
 const Navbar = () => {
   const { getToken, isSignedIn } = useAuth();
   const navigate = useNavigate();
-  const profileHoverAnimation = "transition-all duration-300 hover:scale-110 hover:shadow-md";
+  const profileHoverAnimation = "";
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -154,17 +158,29 @@ const Navbar = () => {
           <div className="w-full lg:w-auto flex items-center justify-between">
             <Link
               to="/"
-              className="btn btn-ghost gap-2 px-1 lg:px-2 font-mono text-sm sm:text-base lg:text-xl font-semibold tracking-wide hover:bg-transparent"
+              className="btn btn-ghost gap-2 px-1 lg:px-2 font-mono text-sm sm:text-base lg:text-xl font-semibold tracking-wide !bg-transparent hover:!bg-transparent active:!bg-transparent focus:!bg-transparent border-0 shadow-none"
             >
-              <span
+             <span
+                className={`flex items-center justify-center rounded-full overflow-hidden
+                  h-16 w-16 sm:h-20 sm:w-20 lg:h-20 lg:w-20
+                  ${theme === "light" ? "bg-base-100" : ""}
+                `}
+              >
+                <img
+                  src="/brand-logo.png"
+                  alt="The Emporium Corner logo"
+                  className="h-full w-full object-contain scale-125"
+                />
+              </span>
+              {/* <span
                 className={`rounded-full ${theme === "light" ? "bg-base-100 p-1" : ""}`}
               >
                 <img
                   src="/brand-logo.png"
                   alt="The Emporium Corner logo"
-                  className={`h-[2.88rem] w-[2.88rem] lg:h-10 lg:w-10 object-cover rounded-full shadow-sm ${profileHoverAnimation}`}
+                  className={`h-[2.50rem] w-[2.88rem] lg:h-10 lg:w-10 object-contain scale-250 rounded-full shadow-sm p-1 ${profileHoverAnimation}`}
                 />
-              </span>
+              </span> */}
               <img
                 src="/brand-text.png"
                 alt="The Emporium Corner"
@@ -238,6 +254,20 @@ const Navbar = () => {
             <SearchForm className="w-48 focus-within:w-64" />
 
             <Show when={"signed-in"}>
+              <NavLink
+                to="/favorites"
+                className={({ isActive }) =>
+                  `btn btn-ghost gap-2 font-medium ${isActive ? "text-primary" : ""}`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <HeartIcon className={`size-6 opacity-90 ${isActive ? "fill-primary" : ""}`} aria-hidden />
+                    <span>Favorites</span>
+                  </>
+                )}
+              </NavLink>
+
               <NavLink
                 to="/orders"
                 className={({ isActive }) =>

@@ -13,6 +13,7 @@ function HomePage() {
     error,
     loadingList,
     setCategory,
+    categories,
   } = useHomeCatalog();
 
   return (

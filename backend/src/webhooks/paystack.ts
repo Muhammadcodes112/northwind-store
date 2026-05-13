@@ -68,7 +68,7 @@ export async function paystackWebhookHandler(req: Request, res: Response) {
           .insert(orders)
           .values({
             userId: session.userId,
-            status: "paid",
+            status: "completed",
             paystackReference: data.reference,
             deliveryLocation: metadata.delivery_location ?? null,
             totalCents: session.totalCents,
@@ -91,16 +91,26 @@ export async function paystackWebhookHandler(req: Request, res: Response) {
         await reduceStockForOrder(order.id);
 
         const { createNotification } = await import("../controllers/notificationController.js");
+        
+        // 1. Payment Notification
         await createNotification(order.userId, {
-          title: "Payment Confirmed",
+          title: "Payment Confirmed ✅",
           message: `We've received your payment for order #${order.id.slice(0, 8)}.`,
           type: "payment",
           link: `/orders/${order.id}`,
         });
 
+        // 2. Order Completed Notification
+        await createNotification(order.userId, {
+          title: "Order Completed 🎉",
+          message: `Your order #${order.id.slice(0, 8)} is now marked as completed. Thank you for your purchase!`,
+          type: "order_update",
+          link: `/orders/${order.id}`,
+        });
+
         // @ts-ignore
-        const { notifyOrderCreated } = await import("../lib/orderNotifications");
-        notifyOrderCreated(order.id).catch(console.error);
+        const { notifyOrderCompleted } = await import("../lib/orderNotifications");
+        await notifyOrderCompleted(order.id).catch(console.error);
       }
       
       console.log(`Order created for Paystack ref ${data.reference}`);

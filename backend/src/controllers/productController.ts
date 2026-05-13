@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { db } from "../db";
 import { products } from "../db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import {
   selectProductBySlugWithImageFallback,
   selectProductsWithImageFallback,
@@ -12,7 +12,9 @@ export async function listProducts(req: Request, res: Response, next: NextFuncti
     const cat = typeof req.query.category === "string" ? req.query.category.trim() : "";
 
     const activeOnly = eq(products.active, true);
-    const whereClause = cat ? and(activeOnly, eq(products.category, cat)) : activeOnly;
+    const whereClause = cat 
+      ? and(activeOnly, sql`lower(${products.category}) = lower(${cat})`) 
+      : activeOnly;
 
     const rows = await selectProductsWithImageFallback(whereClause);
 

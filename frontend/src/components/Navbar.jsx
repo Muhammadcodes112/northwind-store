@@ -20,36 +20,91 @@ import {
 import { useCart } from "../store/cart";
 import toast from "react-hot-toast";
 
-const SearchForm = ({ className }) => (
-  <form 
-    className={`relative ${className}`} 
-    onSubmit={(e) => {
-      e.preventDefault();
-      const q = new FormData(e.target).get("q").trim();
-      if (q) window.location.href = `/?q=${encodeURIComponent(q)}#catalog`;
-      else window.location.href = `/#catalog`;
-    }}
-  >
-    <input
-      name="q"
-      type="text"
-      placeholder="Search..."
-      className="input input-sm input-bordered rounded-full w-full pl-8 transition-all duration-300"
-      defaultValue={new URLSearchParams(window.location.search).get("q") || ""}
-    />
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-4 w-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-base-content/50"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-    </svg>
-  </form>
-);
+const SearchForm = ({ className }) => {
+  const [history, setHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const searchRef = useEffect(() => {
+    const saved = localStorage.getItem("searchHistory");
+    if (saved) setHistory(JSON.parse(saved));
+  }, []);
+
+  const saveSearch = (q) => {
+    const newHistory = [q, ...history.filter(s => s !== q)].slice(0, 8);
+    setHistory(newHistory);
+    localStorage.setItem("searchHistory", JSON.stringify(newHistory));
+  };
+
+  return (
+    <div className={`relative ${className}`}>
+      <form 
+        onSubmit={(e) => {
+          e.preventDefault();
+          const q = new FormData(e.target).get("q").trim();
+          if (q) {
+            saveSearch(q);
+            window.location.href = `/?q=${encodeURIComponent(q)}#catalog`;
+          } else {
+            window.location.href = `/#catalog`;
+          }
+        }}
+      >
+        <input
+          name="q"
+          type="text"
+          autoComplete="off"
+          placeholder="Search..."
+          className="input input-sm input-bordered rounded-full w-full pl-8 transition-all duration-300"
+          defaultValue={new URLSearchParams(window.location.search).get("q") || ""}
+          onFocus={() => setShowHistory(true)}
+          onBlur={() => setTimeout(() => setShowHistory(false), 200)}
+        />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-4 w-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-base-content/50"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </form>
+
+      {showHistory && history.length > 0 && (
+        <div className="absolute top-full left-0 right-0 mt-1 bg-base-100 border border-base-200 rounded-xl shadow-xl z-50 overflow-hidden py-2 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="px-3 pb-1 text-[10px] font-bold text-base-content/40 uppercase tracking-wider">Recent Searches</div>
+          {history.map((s) => (
+            <button
+              key={s}
+              className="flex items-center gap-3 w-full px-3 py-2 text-sm text-left hover:bg-base-200 transition-colors"
+              onClick={() => {
+                window.location.href = `/?q=${encodeURIComponent(s)}#catalog`;
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-base-content/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="truncate">{s}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const MobileSearchModal = ({ isOpen, onClose }) => {
+  const [history, setHistory] = useState([]);
+  useEffect(() => {
+    const saved = localStorage.getItem("searchHistory");
+    if (saved) setHistory(JSON.parse(saved));
+  }, [isOpen]);
+
+  const saveSearch = (q) => {
+    const newHistory = [q, ...history.filter(s => s !== q)].slice(0, 8);
+    setHistory(newHistory);
+    localStorage.setItem("searchHistory", JSON.stringify(newHistory));
+  };
+
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-[100] bg-base-100 flex flex-col animate-in fade-in zoom-in-95 duration-200">
@@ -64,8 +119,12 @@ const MobileSearchModal = ({ isOpen, onClose }) => {
           onSubmit={(e) => {
             e.preventDefault();
             const q = new FormData(e.target).get("q").trim();
-            if (q) window.location.href = `/?q=${encodeURIComponent(q)}#catalog`;
-            else window.location.href = `/#catalog`;
+            if (q) {
+              saveSearch(q);
+              window.location.href = `/?q=${encodeURIComponent(q)}#catalog`;
+            } else {
+              window.location.href = `/#catalog`;
+            }
             onClose();
           }}
         >
@@ -84,22 +143,50 @@ const MobileSearchModal = ({ isOpen, onClose }) => {
         </form>
       </div>
       <div className="flex-1 p-4 overflow-y-auto">
-        <div className="flex flex-col gap-5">
-          {["perfumes", "cosmetics", "interior decoration", "phones", "boutiques", "cars"].map(s => (
-            <div 
-              key={s} 
-              className="flex items-center gap-4 text-sm text-base-content/90 font-medium cursor-pointer py-1"
-              onClick={() => {
-                window.location.href = `/?q=${encodeURIComponent(s)}#catalog`;
-                onClose();
-              }}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <span className="capitalize">{s}</span>
+        <div className="flex flex-col gap-6">
+          {history.length > 0 && (
+            <div>
+              <h3 className="px-1 mb-3 text-[10px] font-bold text-base-content/40 uppercase tracking-widest">Recent Searches</h3>
+              <div className="flex flex-col gap-4">
+                {history.map((s) => (
+                  <div 
+                    key={s} 
+                    className="flex items-center gap-4 text-sm text-base-content font-medium cursor-pointer"
+                    onClick={() => {
+                      window.location.href = `/?q=${encodeURIComponent(s)}#catalog`;
+                      onClose();
+                    }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-base-content/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="truncate">{s}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
+          )}
+
+          <div>
+            <h3 className="px-1 mb-3 text-[10px] font-bold text-base-content/40 uppercase tracking-widest">Suggested</h3>
+            <div className="flex flex-col gap-4">
+              {["perfumes", "cosmetics", "interior decoration", "phones", "boutiques", "cars"].map(s => (
+                <div 
+                  key={s} 
+                  className="flex items-center gap-4 text-sm text-base-content/90 font-medium cursor-pointer"
+                  onClick={() => {
+                    window.location.href = `/?q=${encodeURIComponent(s)}#catalog`;
+                    onClose();
+                  }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <span className="capitalize">{s}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

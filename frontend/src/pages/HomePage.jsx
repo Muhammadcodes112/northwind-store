@@ -53,22 +53,12 @@ function HomePage() {
                   ALL
                 </button>
 
-                {[
-                  "PHARMACEUTICAL DRUGS",
-                  "COSMETICS",
-                  "BOUTIQUES",
-                  "ACCESSORIES",
-                  "KITCHEN UTENSILS",
-                  "PHONES",
-                  "CARS",
-                  "INTERIOR DECORATION",
-                  "OTHERS"
-                ].map((c) => (
+                {categories.map((c) => (
                   <button
                     key={c}
                     type="button"
                     className={`text-[10.5px] sm:text-[12px] font-medium uppercase ${
-                      categoryFilter?.toUpperCase() === c
+                      categoryFilter?.toLowerCase() === c.toLowerCase()
                         ? "text-primary underline decoration-primary underline-offset-4"
                         : "text-base-content/70"
                     }`}

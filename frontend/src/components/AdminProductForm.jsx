@@ -147,7 +147,7 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
   }
 
   return (
-    <form className="mt-4 flex flex-col gap-3 text-[90%]" onSubmit={handleSubmit}>
+    <form className="mt-4 flex flex-col gap-3 text-[72%] sm:text-[90%]" onSubmit={handleSubmit}>
       <label className="form-control w-full">
         <span className="label-text">Name</span>
         <input
@@ -302,29 +302,33 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
         ) : null}
       </div>
 
-      <label className="label cursor-pointer justify-start gap-3">
-        <input
-          type="checkbox"
-          className="toggle toggle-primary"
-          checked={active}
-          onChange={(e) => setActive(e.target.checked)}
-        />
-        <span className="label-text">Active in store</span>
-      </label>
-
-      {error ? (
-        <div role="alert" className="alert alert-error text-sm">
+            {error ? (
+        <div role="alert" className="alert alert-error text-sm mt-2">
           {typeof error === "string" ? error : "Save failed. Check the product fields and try again."}
         </div>
       ) : null}
 
-      <div className="modal-action">
-        <button type="button" className="btn btn-ghost" onClick={onCancel}>
-          Cancel
-        </button>
-        <button type="submit" className="btn btn-primary" disabled={saving || uploadingImage}>
-          {saving ? <span className="loading loading-spinner loading-sm" /> : "Save"}
-        </button>
+      <div className="mt-2 flex items-center justify-between">
+        <label className="label cursor-pointer justify-start gap-2 sm:gap-3 py-0">
+          <input
+            type="checkbox"
+            className="toggle toggle-primary toggle-sm sm:toggle-md"
+            checked={active}
+            onChange={(e) => setActive(e.target.checked)}
+          />
+          <span className="label-text text-xs sm:text-sm">Active</span>
+        </label>
+
+
+
+              <div className="flex items-center gap-2">
+          <button type="button" className="btn btn-ghost btn-sm sm:btn-md" onClick={onCancel}>
+            Cancel
+          </button>
+          <button type="submit" className="btn btn-primary btn-sm sm:btn-md" disabled={saving || uploadingImage}>
+            {saving ? <span className="loading loading-spinner loading-xs" /> : "Save"}
+          </button>
+        </div>
       </div>
     </form>
   );

@@ -37,7 +37,7 @@ export function ProductImageSlider({ product }) {
     : null;
 
   return (
-    <div className="card overflow-hidden border border-base-300 bg-base-100 shadow-lg mx-auto w-[60%] sm:w-full">
+    <div className="card overflow-hidden border-y sm:border border-base-300 bg-base-100 sm:shadow-lg mx-auto w-[calc(100%+2rem)] -ml-4 sm:ml-auto sm:w-full rounded-none sm:rounded-2xl">
       <div className="relative aspect-square overflow-hidden bg-base-300 group">
         {images.length > 0 ? (
           <div

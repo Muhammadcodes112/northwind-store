@@ -196,19 +196,37 @@ export async function notifyOrderCompleted(orderId: string) {
       to: [user.email],
       subject: `Order Completed: #${order.id.slice(0, 8)}`,
       html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 10px; padding: 20px;">
-          <h2 style="color: #4CAF50; text-align: center;">Order Completed!</h2>
-          <p>Hello ${user.displayName || "Customer"},</p>
-          <p>Your order has been marked as completed successfully. Thank you for patronizing The Emporium Corner!</p>
-          <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 5px 0;"><strong>Order ID:</strong> #${order.id.slice(0, 8)}</p>
-            <p style="margin: 5px 0;"><strong>Total Paid:</strong> ${currencyFromCents(order.totalCents)}</p>
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+          <div style="text-align: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px;">
+            <h2 style="color: #4CAF50; margin: 0; font-size: 24px;">Order Completed! 🎉</h2>
           </div>
-          <h3 style="color: #333; margin-top: 20px;">Order Details</h3>
-          <div>${lines || "<p>No items</p>"}</div>
-          <p style="text-align: center; margin-top: 30px; font-weight: bold; color: #555;">
-            Thank you for patronizing The Emporium Corner!
-          </p>
+          <p style="font-size: 16px; color: #333;">Hello <strong>${user.displayName || "Customer"}</strong>,</p>
+          <p style="font-size: 15px; color: #555; line-height: 1.5;">Your order has been marked as completed successfully. Thank you for patronizing The Emporium Corner!</p>
+          
+          <div style="background-color: #f8fbfa; border-left: 4px solid #4CAF50; padding: 15px; border-radius: 4px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #2E7D32; font-size: 16px;">Order Summary</h3>
+            <p style="margin: 8px 0; color: #444;"><strong>Order ID:</strong> <span style="font-family: monospace;">#${order.id.slice(0, 8)}</span></p>
+            <p style="margin: 8px 0; color: #444;"><strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            <p style="margin: 8px 0; color: #444;"><strong>Delivered To:</strong> ${order.deliveryLocation || "Not provided"}</p>
+            <p style="margin: 8px 0; color: #444; font-size: 16px;"><strong>Total Paid:</strong> <strong style="color: #4CAF50;">${currencyFromCents(order.totalCents)}</strong></p>
+          </div>
+          
+          <h3 style="color: #333; margin-top: 25px; border-bottom: 1px solid #eee; padding-bottom: 8px;">Items Ordered</h3>
+          <div style="margin-bottom: 30px;">${lines || "<p style='color: #888;'>No items</p>"}</div>
+          
+          <div style="text-align: center; margin-top: 40px; padding: 20px; background-color: #fefefe; border-radius: 8px; border: 1px dashed #ccc;">
+            <p style="font-weight: bold; color: #333; margin-bottom: 15px; font-size: 16px;">
+              Thank you for patronizing us! We hope to see you again soon.
+            </p>
+            <a href="${process.env.FRONTEND_URL || 'https://the-emporium-corner.vercel.app'}" style="background-color: #4CAF50; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px; transition: background-color 0.3s; box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);">
+              Order Again
+            </a>
+          </div>
+          
+          <div style="margin-top: 30px; text-align: center; font-size: 13px; color: #777; border-top: 1px solid #eaeaea; padding-top: 20px;">
+            <p style="margin: 4px 0; font-weight: bold;">The Emporium Corner</p>
+            <p style="margin: 4px 0;">📍 No. 116 Zaria Road, Rigasa Kaduna.</p>
+          </div>
         </div>
       `,
     });

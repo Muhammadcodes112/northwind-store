@@ -17,6 +17,7 @@ import {
   selectProductsWithImageFallback,
   updateProductWithImageFallback,
 } from "../lib/productSelect";
+import { notifyOrderCompleted } from "../lib/orderNotifications.js";
 
 const env = getEnv();
 
@@ -154,8 +155,34 @@ export async function createAdminProduct(req: Request, res: Response, next: Next
       imageUrls: urls,
       imageKitFileIds: fileIds,
     });
+
+    if (row) {
+      // Notify all users about the new product
+      const allUsers = await db.select({ id: users.id }).from(users);
+      const { createNotification } = await import("./notificationController.js");
+      
+      // Using Promise.all for faster execution, though bulk insert would be even better
+      // if createNotification supported it. For now, let's keep it simple.
+      Promise.all(allUsers.map(u => 
+        createNotification(u.id, {
+          title: "Just landed! 🚀",
+          message: `${row.name} is now available in our store. Check it out before it's gone!`,
+          type: "info",
+          link: `/product/${row.slug}`,
+        })
+      )).catch(err => console.error("Failed to notify users about new product:", err));
+    }
+
     res.status(201).json({ product: row });
-  } catch (e) {
+  } catch (e: any) {
+    if (e?.code === "23505") {
+      res.status(400).json({ error: "A product with this name/slug already exists." });
+      return;
+    }
+    if (e?.code === "22003") {
+      res.status(400).json({ error: "Price or stock value is too large." });
+      return;
+    }
     next(e);
   }
 }
@@ -183,7 +210,15 @@ export async function updateAdminProduct(req: Request, res: Response, next: Next
     }
 
     res.json({ product: row });
-  } catch (e) {
+  } catch (e: any) {
+    if (e?.code === "23505") {
+      res.status(400).json({ error: "A product with this name/slug already exists." });
+      return;
+    }
+    if (e?.code === "22003") {
+      res.status(400).json({ error: "Price or stock value is too large." });
+      return;
+    }
     next(e);
   }
 }
@@ -413,6 +448,10 @@ export async function updateAdminOrderStatus(req: Request, res: Response, next: 
     if (status === "paid" || status === "completed") {
       const { reduceStockForOrder } = await import("../lib/inventory.js");
       await reduceStockForOrder(updated.id);
+    }
+
+    if (status === "completed") {
+      notifyOrderCompleted(updated.id).catch(console.error);
     }
 
     const itemRows = await db

@@ -14,6 +14,16 @@ export async function getLocalUser(clerkUserId: string) {
         clerkUserId,
       })
       .returning();
+
+    if (newUser) {
+      const { createNotification } = await import("../controllers/notificationController.js");
+      await createNotification(newUser.id, {
+        title: "Welcome to The Emporium Corner! 🛍️",
+        message: "We're glad to have you here. Explore our wide range of premium products and enjoy a seamless shopping experience!",
+        type: "info",
+        link: "/",
+      });
+    }
     return newUser;
   } catch (e) {
     console.error("Failed to auto-create user:", e);

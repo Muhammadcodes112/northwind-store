@@ -5,7 +5,7 @@ import { isStaff } from "../lib/roles";
 import { db } from "../db";
 import { orderItems, orders, products } from "../db/schema";
 import { asc, desc, eq, inArray } from "drizzle-orm";
-import { notifyOrderCompleted } from "../lib/orderNotifications";
+import { notifyOrderCompleted, notifyOrderCancelled } from "../lib/orderNotifications";
 import { baseProductColumns, hydrateLegacyImages } from "../lib/productSelect";
 
 export async function listOrders(req: Request, res: Response, next: NextFunction) {
@@ -167,6 +167,7 @@ export async function cancelOrder(req: Request, res: Response, next: NextFunctio
       .where(eq(orders.id, order.id))
       .returning();
 
+    notifyOrderCancelled(updatedOrder.id).catch(console.error);
     res.json({ order: updatedOrder });
   } catch (e) {
     next(e);

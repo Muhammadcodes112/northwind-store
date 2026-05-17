@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAuth } from "@clerk/react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../lib/api";
@@ -33,6 +34,24 @@ function NotificationPage() {
 
   const notifications = data?.notifications ?? [];
   const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const [perm, setPerm] = useState(() => typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'denied');
+
+  const requestNotificationPermission = async () => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      try {
+        const result = await Notification.requestPermission();
+        setPerm(result);
+        if (result === 'granted') {
+          toast.success("Desktop & Mobile notifications enabled!");
+        } else {
+          toast.error("Notification permission " + result);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
 
   if (isLoading) {
     return (
@@ -70,6 +89,18 @@ function NotificationPage() {
           </button>
         )}
       </div>
+
+      {perm === 'default' && (
+        <div className="mb-6 alert alert-info bg-primary/10 border border-primary/20 text-base-content rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4">
+          <div>
+            <h3 className="font-bold text-sm sm:text-base">Get instant order updates</h3>
+            <p className="text-xs sm:text-sm text-base-content/80 mt-0.5">Enable push notifications to receive updates in your notification center just like WhatsApp messages.</p>
+          </div>
+          <button onClick={requestNotificationPermission} className="btn btn-primary btn-sm shrink-0">
+            Enable Notifications
+          </button>
+        </div>
+      )}
 
       <div className="space-y-3">
         {notifications.length === 0 ? (

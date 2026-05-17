@@ -268,3 +268,77 @@ export async function notifyOrderCompleted(orderId: string) {
   }
 }
 
+export async function notifyOrderCancelled(orderId: string) {
+  const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
+  if (!order) return;
+
+  const [user] = await db.select().from(users).where(eq(users.id, order.userId)).limit(1);
+  if (!user) return;
+
+  const adminUsers = await db.select().from(users).where(eq(users.role, "admin"));
+  if (adminUsers.length === 0) return;
+
+  const itemRows = await db
+    .select({
+      name: products.name,
+      quantity: orderItems.quantity,
+      unitPriceCents: orderItems.unitPriceCents,
+    })
+    .from(orderItems)
+    .innerJoin(products, eq(orderItems.productId, products.id))
+    .where(eq(orderItems.orderId, order.id));
+
+  const lines = itemRows
+    .map(
+      (item) =>
+        `<li>${item.name} - Qty: ${item.quantity} - Price: ${currencyFromCents(item.unitPriceCents * item.quantity)}</li>`,
+    )
+    .join("");
+
+  const itemDetails = itemRows.map(i => `${i.quantity}x ${i.name}`).join(", ");
+  const { createNotification } = await import("../controllers/notificationController.js");
+
+  for (const admin of adminUsers) {
+    await createNotification(admin.id, {
+      title: "Order Cancelled",
+      message: `Order #${order.id.slice(0, 8)} placed by ${user.displayName || user.email || 'a customer'} containing ${itemDetails || 'items'} was cancelled by the customer.`,
+      type: "order_update",
+      link: `/admin/orders/${order.id}`,
+    });
+  }
+
+  const resendKey = process.env.RESEND_API_KEY;
+  if (!resendKey) return;
+
+  const adminEmails = adminUsers.map((u) => u.email).filter(Boolean);
+  if (adminEmails.length === 0) return;
+
+  // @ts-ignore
+  const { Resend } = await import("resend");
+  const resend = new Resend(resendKey);
+
+  for (const adminEmail of adminEmails) {
+    await resend.emails.send({
+      from: "Emporium Corner Orders <onboarding@resend.dev>",
+      to: adminEmail,
+      subject: `Order Cancelled: #${order.id.slice(0, 8)}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #D32F2F;">Order Cancelled</h2>
+          <p>An order has been cancelled by the customer.</p>
+          <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 4px solid #D32F2F;">
+            <p><strong>Order Code:</strong> #${order.id.slice(0, 8)}</p>
+            <p><strong>Customer Name:</strong> ${user.displayName || "N/A"}</p>
+            <p><strong>Customer Email:</strong> ${user.email || "N/A"}</p>
+            <p><strong>Customer Phone:</strong> ${user.whatsappNumber || "Not provided"}</p>
+            <p><strong>Delivery Location:</strong> ${order.deliveryLocation ?? "Not provided"}</p>
+            <p><strong>Total:</strong> ${currencyFromCents(order.totalCents)}</p>
+            <p><strong>Status:</strong> ${order.status}</p>
+          </div>
+          <p><strong>Products:</strong></p>
+          <ul>${lines || "<li>No items</li>"}</ul>
+        </div>
+      `,
+    }).catch(console.error);
+  }
+}

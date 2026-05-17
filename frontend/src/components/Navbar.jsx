@@ -23,7 +23,7 @@ import toast from "react-hot-toast";
 const SearchForm = ({ className }) => {
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
-  const searchRef = useEffect(() => {
+  useEffect(() => {
     const saved = localStorage.getItem("searchHistory");
     if (saved) setHistory(JSON.parse(saved));
   }, []);
@@ -231,6 +231,71 @@ const Navbar = () => {
   });
 
   const unreadCount = notificationsData?.notifications?.filter((n) => !n.read).length ?? 0;
+
+  const [notifiedIds, setNotifiedIds] = useState(() => {
+    try {
+      const saved = localStorage.getItem("notified_ids");
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+
+  useEffect(() => {
+    if (!notificationsData?.notifications) return;
+
+    const unread = notificationsData.notifications.filter(n => !n.read);
+    let hasNew = false;
+    const newIds = new Set(notifiedIds);
+
+    unread.forEach(n => {
+      if (!notifiedIds.has(n.id)) {
+        hasNew = true;
+        newIds.add(n.id);
+        
+        if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(reg => {
+              reg.showNotification(n.title, {
+                body: n.message,
+                icon: '/brand-logo.png',
+                badge: '/brand-logo.png',
+                data: { url: n.link || '/notifications' }
+              });
+            }).catch(err => {
+              console.error("SW showNotification failed", err);
+              const notification = new Notification(n.title, {
+                body: n.message,
+                icon: '/brand-logo.png'
+              });
+              notification.onclick = () => {
+                window.focus();
+                if (n.link) window.location.href = n.link;
+              };
+            });
+          } else {
+            const notification = new Notification(n.title, {
+              body: n.message,
+              icon: '/brand-logo.png'
+            });
+            notification.onclick = () => {
+              window.focus();
+              if (n.link) window.location.href = n.link;
+            };
+          }
+        }
+      }
+    });
+
+    if (hasNew) {
+      setNotifiedIds(newIds);
+      try {
+        localStorage.setItem("notified_ids", JSON.stringify(Array.from(newIds)));
+      } catch (e) {
+        console.error("Failed to save notified_ids", e);
+      }
+    }
+  }, [notificationsData, notifiedIds]);
 
   const adminWelcome = () =>
     toast.success("Welcome back, Admin. You are in control.", {

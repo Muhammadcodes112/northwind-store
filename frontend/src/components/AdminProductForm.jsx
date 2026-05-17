@@ -196,10 +196,11 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
       </label>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <label className="form-control">
+        <div className="flex gap-3 items-start w-full">
+          <label className="form-control flex-1">
           <span className="label-text">Price (NGN)</span>
           <input
-            className="input input-bordered"
+            className="input input-bordered w-full"
             type="number"
             step="0.01"
             min="0.01"
@@ -209,10 +210,10 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
           />
         </label>
         
-        <label className="form-control">
+        <label className="form-control flex-1">
           <span className="label-text">Discount Price (NGN) <span className="text-base-content/50 text-xs">Optional</span></span>
           <input
-            className="input input-bordered"
+            className="input input-bordered w-full"
             type="number"
             step="0.01"
             min="0.01"
@@ -220,6 +221,7 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
             onChange={(e) => setDiscountPriceCents(e.target.value)}
           />
         </label>
+      </div>
 
         <label className="form-control">
           <span className="label-text">Stock</span>

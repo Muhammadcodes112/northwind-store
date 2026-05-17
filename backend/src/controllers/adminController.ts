@@ -1,6 +1,6 @@
 import { getAuth } from "@clerk/express";
 import type { Request, Response, NextFunction } from "express";
-import { getLocalUser } from "../lib/users";
+import { getLocalUser, hydrateUserContact } from "../lib/users";
 import { isAdmin } from "../lib/roles";
 import ImageKit from "@imagekit/nodejs";
 import { getEnv } from "../lib/env";
@@ -67,31 +67,6 @@ function buildProductUpdateSet(body: z.infer<typeof productPatch>) {
   return data;
 }
 
-async function hydrateUserContact(user: typeof users.$inferSelect) {
-  if (user.email && user.email.trim().length > 0) return user;
-  try {
-    const clerkUser = await clerkClient.users.getUser(user.clerkUserId);
-    const primaryEmail = clerkUser.emailAddresses?.[0]?.emailAddress ?? "";
-    const fullName =
-      [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ").trim() || null;
-
-    if (primaryEmail || fullName) {
-      const [updated] = await db
-        .update(users)
-        .set({
-          ...(primaryEmail ? { email: primaryEmail } : {}),
-          ...(fullName ? { displayName: fullName } : {}),
-          updatedAt: new Date(),
-        })
-        .where(eq(users.id, user.id))
-        .returning();
-      return updated ?? user;
-    }
-  } catch {
-    // fallback to existing db values
-  }
-  return user;
-}
 
 export async function requireAdmin(req: Request, res: Response, next: NextFunction) {
   try {

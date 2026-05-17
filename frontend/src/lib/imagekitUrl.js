@@ -78,6 +78,7 @@ function isImageKitDeliveryUrl(url) {
  */
 export function imageKitOptimizedUrl(url, opts = {}) {
   if (url == null || url === "") return url ?? undefined;
+  if (typeof url === "string" && url.match(/\.(mp4|webm|mov|ogg)$/i)) return url;
   if (typeof url !== "string" || !isImageKitDeliveryUrl(url)) return url;
 
   const tr = buildTrSegment(opts);

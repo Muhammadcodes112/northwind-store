@@ -79,8 +79,10 @@ export async function notifyOrderCreated(orderId: string) {
   const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
   if (!order) return;
 
-  const [user] = await db.select().from(users).where(eq(users.id, order.userId)).limit(1);
+  let [user] = await db.select().from(users).where(eq(users.id, order.userId)).limit(1);
   if (!user) return;
+  const { hydrateUserContact } = await import("./users.js");
+  user = await hydrateUserContact(user);
 
   const adminUsers = await db.select().from(users).where(eq(users.role, "admin"));
   if (adminUsers.length === 0) return;
@@ -157,8 +159,10 @@ export async function notifyOrderCompleted(orderId: string) {
   const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
   if (!order) return;
 
-  const [user] = await db.select().from(users).where(eq(users.id, order.userId)).limit(1);
+  let [user] = await db.select().from(users).where(eq(users.id, order.userId)).limit(1);
   if (!user) return;
+  const { hydrateUserContact } = await import("./users.js");
+  user = await hydrateUserContact(user);
 
   const itemRows = await db
     .select({
@@ -272,8 +276,10 @@ export async function notifyOrderCancelled(orderId: string) {
   const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
   if (!order) return;
 
-  const [user] = await db.select().from(users).where(eq(users.id, order.userId)).limit(1);
+  let [user] = await db.select().from(users).where(eq(users.id, order.userId)).limit(1);
   if (!user) return;
+  const { hydrateUserContact } = await import("./users.js");
+  user = await hydrateUserContact(user);
 
   const adminUsers = await db.select().from(users).where(eq(users.role, "admin"));
   if (adminUsers.length === 0) return;

@@ -44,18 +44,31 @@ export function ProductImageSlider({ product }) {
             className="flex h-full transition-transform duration-500 ease-out"
             style={{ transform: `translateX(-${active * 100}%)` }}
           >
-            {images.map((image, index) => (
-              <figure key={`${image}-${index}`} className="h-full min-w-full">
-                <img
-                  src={imageKitOptimizedUrl(image, IK_PRESETS.productHero)}
-                  alt={product.name}
-                  className="h-full w-full object-cover"
-                  fetchPriority={index === 0 ? "high" : undefined}
-                  loading={index === 0 ? "eager" : "lazy"}
-                  decoding="async"
-                />
-              </figure>
-            ))}
+            {images.map((image, index) => {
+              const isVideo = typeof image === "string" && image.match(/\.(mp4|webm|mov|ogg)$/i);
+              return (
+                <figure key={`${image}-${index}`} className="h-full min-w-full bg-black flex items-center justify-center">
+                  {isVideo ? (
+                    <video
+                      src={image}
+                      className="h-full w-full object-cover"
+                      controls
+                      preload="metadata"
+                      playsInline
+                    />
+                  ) : (
+                    <img
+                      src={imageKitOptimizedUrl(image, IK_PRESETS.productHero)}
+                      alt={product.name}
+                      className="h-full w-full object-cover"
+                      fetchPriority={index === 0 ? "high" : undefined}
+                      loading={index === 0 ? "eager" : "lazy"}
+                      decoding="async"
+                    />
+                  )}
+                </figure>
+              );
+            })}
           </div>
         ) : (
           <div className="h-full w-full" />

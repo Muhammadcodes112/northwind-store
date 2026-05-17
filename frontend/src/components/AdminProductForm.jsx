@@ -198,30 +198,30 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="flex gap-3 items-start w-full">
           <label className="form-control flex-1">
-          <span className="label-text">Price (NGN)</span>
-          <input
-            className="input input-bordered w-full"
-            type="number"
-            step="0.01"
-            min="0.01"
-            value={priceCents}
-            onChange={(e) => setPriceCents(e.target.value)}
-            required
-          />
-        </label>
-        
-        <label className="form-control flex-1">
-          <span className="label-text">Discount Price (NGN) <span className="text-base-content/50 text-xs">Optional</span></span>
-          <input
-            className="input input-bordered w-full"
-            type="number"
-            step="0.01"
-            min="0.01"
-            value={discountPriceCents}
-            onChange={(e) => setDiscountPriceCents(e.target.value)}
-          />
-        </label>
-      </div>
+            <span className="label-text">Price (NGN)</span>
+            <input
+              className="input input-bordered w-full"
+              type="number"
+              step="0.01"
+              min="0.01"
+              value={priceCents}
+              onChange={(e) => setPriceCents(e.target.value)}
+              required
+            />
+          </label>
+          
+          <label className="form-control flex-1">
+            <span className="label-text">Discount Price (NGN) <span className="text-base-content/50 text-xs">Optional</span></span>
+            <input
+              className="input input-bordered w-full"
+              type="number"
+              step="0.01"
+              min="0.01"
+              value={discountPriceCents}
+              onChange={(e) => setDiscountPriceCents(e.target.value)}
+            />
+          </label>
+        </div>
 
         <label className="form-control">
           <span className="label-text">Stock</span>
@@ -236,7 +236,7 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
       </div>
 
       <div className="form-control w-full">
-        <span className="label-text">Images ({images.length}/5)</span>
+        <span className="label-text">Images & Short Videos ({images.length}/5)</span>
         <label className="mb-2 flex cursor-pointer flex-wrap items-center gap-2">
           <span className="btn btn-secondary btn-sm shrink-0">
             {uploadingImage ? (
@@ -246,11 +246,11 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
             )}
           </span>
 
-          <span className="text-xs text-base-content/60">PNG, JPG, WebP, GIF · max 10MB</span>
+          <span className="text-xs text-base-content/60">PNG, JPG, WebP, GIF, MP4, WebM, MOV · max 10MB</span>
 
           <input
             type="file"
-            accept="image/png,image/jpeg,image/webp,image/gif"
+            accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
             className="hidden"
             disabled={uploadingImage || saving || images.length >= 5}
             onChange={handleImageUpload}
@@ -258,7 +258,7 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
         </label>
 
         <label className="label py-0">
-          <span className="label-text-alt text-base-content/60">Image URL (any HTTPS URL)</span>
+          <span className="label-text-alt text-base-content/60">Media URL (any HTTPS URL)</span>
         </label>
 
         <div className="space-y-2">
@@ -280,7 +280,7 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
 
         {images.length < 5 ? (
           <button type="button" className="btn btn-ghost btn-sm mt-2 w-fit" onClick={addImageField}>
-            Add image URL
+            Add media URL
           </button>
         ) : null}
 
@@ -291,15 +291,26 @@ export function AdminProductForm({ initial, saving, error, getToken, onCancel, o
         ) : null}
         {images.some((image) => image.url) ? (
           <div className="mt-2 grid grid-cols-2 gap-2 overflow-hidden rounded-lg border border-base-300 bg-base-200 p-2 sm:grid-cols-5">
-            {images.filter((image) => image.url).map((image, index) => (
-              <img
-                key={`${image.url}-${index}`}
-                src={imageKitOptimizedUrl(image.url, IK_PRESETS.formPreview)}
-                alt=""
-                className="mx-auto aspect-square max-h-24 w-full rounded-md object-cover"
-                decoding="async"
-              />
-            ))}
+            {images.filter((image) => image.url).map((image, index) => {
+              const isVideo = image.url.match(/\.(mp4|webm|mov|ogg)$/i);
+              return isVideo ? (
+                <video
+                  key={`${image.url}-${index}`}
+                  src={image.url}
+                  className="mx-auto aspect-square max-h-24 w-full rounded-md object-cover bg-black"
+                  controls
+                  preload="metadata"
+                />
+              ) : (
+                <img
+                  key={`${image.url}-${index}`}
+                  src={imageKitOptimizedUrl(image.url, IK_PRESETS.formPreview)}
+                  alt=""
+                  className="mx-auto aspect-square max-h-24 w-full rounded-md object-cover"
+                  decoding="async"
+                />
+              );
+            })}
           </div>
         ) : null}
       </div>

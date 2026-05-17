@@ -12,7 +12,7 @@ self.addEventListener('push', (event) => {
   const options = {
     body: data.message || 'You have a new notification.',
     icon: '/brand-logo.png',
-    badge: '/brand-logo.png',
+    badge: '/badge.svg',
     data: { url: data.link || '/notifications' }
   };
   event.waitUntil(self.registration.showNotification(title, options));

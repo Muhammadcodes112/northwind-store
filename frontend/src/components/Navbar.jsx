@@ -259,7 +259,7 @@ const Navbar = () => {
               reg.showNotification(n.title, {
                 body: n.message,
                 icon: '/brand-logo.png',
-                badge: '/brand-logo.png',
+                badge: '/badge.svg',
                 data: { url: n.link || '/notifications' }
               });
             }).catch(err => {
